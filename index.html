@@ -2478,54 +2478,83 @@ function showBackupStatus(msg, isError = false) {
 }
 
 // ===== バーコードスキャナー =====
-let scannerReader = null;
-let scannerPrefix = '';
+// ライブ映像スキャンをやめ「写真を撮って読み取る」方式に変更
+// → ZXingがDOMを汚染してタッチを横取りする問題を根本解消
+function openBarcodeScanner(prefix) {
+  const input = document.createElement('input');
+  input.type    = 'file';
+  input.accept  = 'image/*';
+  input.capture = 'environment'; // iOSはリアカメラで直接起動
 
-async function openBarcodeScanner(prefix) {
-  scannerPrefix = prefix;
-  document.getElementById('modal-scanner').classList.add('open');
-  document.getElementById('scanner-status').textContent = 'カメラを起動中...';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const frame = document.querySelector('.scanner-frame');
-  if (frame && !frame.querySelector('.scanner-line')) {
-    frame.innerHTML = '<div class="scanner-line"></div><div class="sf-bl"></div><div class="sf-br"></div>';
-  }
+    // ステータス表示
+    const statusEl = prefix === 'qs'
+      ? document.getElementById('qs-isbn-status')
+      : document.getElementById(`${prefix}-isbn-status`);
+    if (statusEl) { statusEl.textContent = '読み取り中...'; statusEl.style.display = 'block'; }
 
-  try {
-    const hints = new Map();
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8]);
-    scannerReader = new ZXing.BrowserMultiFormatReader(hints);
+    const url = URL.createObjectURL(file);
+    try {
+      let code = null;
 
-    await scannerReader.decodeFromConstraints(
-      { video: { facingMode: 'environment' } },
-      'scanner-video',
-      (result, err) => {
-        if (!result) return;
-        const code = result.getText().replace(/[^0-9X]/g, '');
+      // ① BarcodeDetector（iOS17以降）で試みる
+      if ('BarcodeDetector' in window) {
+        try {
+          const img = new Image();
+          img.src = url;
+          await new Promise(r => { img.onload = r; img.onerror = r; });
+          const det = new BarcodeDetector({ formats: ['ean_13','ean_8'] });
+          const results = await det.detect(img);
+          if (results.length) code = results[0].rawValue;
+        } catch(_) {}
+      }
+
+      // ② ZXing静止画デコードで試みる
+      if (!code) {
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,
+          [ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8]);
+        const reader = new ZXing.BrowserMultiFormatReader(hints);
+        const img = new Image();
+        img.src = url;
+        await new Promise(r => { img.onload = r; img.onerror = r; });
+        try {
+          const res = await reader.decodeFromImageElement(img);
+          code = res.getText();
+        } catch(_) {}
+      }
+
+      if (code) {
+        code = code.replace(/[^0-9X]/g, '');
         if (code.startsWith('978')) {
           const suffix = code.startsWith('9784') ? code.slice(4) : code;
-          closeBarcodeScanner();
+          if (statusEl) statusEl.style.display = 'none';
           if (prefix === 'qs') {
-            // クイックスキャン用
             document.getElementById('qs-isbn').value = suffix.slice(0, 9);
             lookupQS();
           } else {
             document.getElementById(`${prefix}-isbn`).value = suffix.slice(0, 9);
             lookupISBN(prefix);
           }
+        } else {
+          if (statusEl) statusEl.textContent = '書籍のバーコードが見つかりませんでした。もう一度試してください。';
         }
+      } else {
+        if (statusEl) statusEl.textContent = 'バーコードを読み取れませんでした。明るい場所で再試行してください。';
       }
-    );
-    document.getElementById('scanner-status').textContent = '';
-  } catch(e) {
-    document.getElementById('scanner-status').textContent = 'カメラへのアクセスを許可してください';
-  }
+    } catch(err) {
+      if (statusEl) statusEl.textContent = '読み取りに失敗しました。もう一度試してください。';
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  };
+  input.click();
 }
 
-function closeBarcodeScanner() {
-  if (scannerReader) { scannerReader.reset(); scannerReader = null; }
-  document.getElementById('modal-scanner').classList.remove('open');
-}
+function closeBarcodeScanner() {} // 互換性のため残す
 
 // ===== 初期化 =====
 renderList();
