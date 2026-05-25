@@ -663,6 +663,46 @@
     75%  { opacity: 1; }
     100% { opacity: 0; }
   }
+  /* ===== BACKUP BUTTON ===== */
+  .btn-backup {
+    background: rgba(0,0,0,0.06);
+    border: none;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #1d1d1f;
+    transition: background 0.15s;
+  }
+  .btn-backup:active { background: rgba(0,0,0,0.12); }
+
+  /* ===== BACKUP MODAL ===== */
+  .backup-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  .backup-card-icon { font-size: 28px; flex-shrink: 0; }
+  .backup-card-body { flex: 1; min-width: 0; }
+  .backup-card-title { font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px; }
+  .backup-card-desc  { font-size: 12px; color: #6e6e73; line-height: 1.5; }
+  .btn-secondary {
+    background: rgba(0,102,204,0.1);
+    color: #0066cc;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-secondary:active { background: rgba(0,102,204,0.2); }
+
   /* ===== GROUP BAR ===== */
   .group-bar {
     display: none;
@@ -774,6 +814,9 @@
         <button class="btn-spotify" onclick="onSpotifyBtn()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
           Spotify
+        </button>
+        <button class="btn-backup" onclick="openBackup()" title="バックアップ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </button>
         <button class="btn-add" onclick="openAdd()">＋</button>
       </div>
@@ -942,6 +985,47 @@
           連携を解除する
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== バックアップモーダル ===== -->
+<div class="modal-overlay" id="modal-backup">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <button class="modal-cancel" onclick="closeBackup()">閉じる</button>
+      <span class="modal-title">バックアップ</span>
+      <span style="width:52px"></span>
+    </div>
+    <div style="padding:24px 20px;display:flex;flex-direction:column;gap:16px">
+
+      <div class="backup-card">
+        <div class="backup-card-icon">⬆️</div>
+        <div class="backup-card-body">
+          <div class="backup-card-title">書き出し（エクスポート）</div>
+          <div class="backup-card-desc">全データをJSONファイルとしてダウンロードします。GitHubに保存してバックアップとして使えます。</div>
+        </div>
+        <button class="btn-primary" onclick="exportData()" style="flex-shrink:0">書き出し</button>
+      </div>
+
+      <div class="backup-card">
+        <div class="backup-card-icon">⬇️</div>
+        <div class="backup-card-body">
+          <div class="backup-card-title">読み込み（インポート）</div>
+          <div class="backup-card-desc">JSONファイルからデータを復元します。既存データと重複しない記録だけ追加されます。</div>
+        </div>
+        <button class="btn-secondary" onclick="importData()" style="flex-shrink:0">読み込み</button>
+      </div>
+
+      <div style="background:#f5f5f7;border-radius:12px;padding:14px 16px">
+        <p style="font-size:12px;color:#6e6e73;line-height:1.6;margin:0">
+          <strong style="color:#1d1d1f">GitHubでの使い方</strong><br>
+          ① 書き出し → JSONファイルをGitHubリポジトリにアップ<br>
+          ② 機種変更・復元時は GitHubからJSONをダウンロード → 読み込み
+        </p>
+      </div>
+
+      <div id="backup-status" style="font-size:13px;color:#34c759;text-align:center;display:none;font-weight:600"></div>
     </div>
   </div>
 </div>
@@ -1948,6 +2032,60 @@ async function lookupISBN(prefix) {
   } catch(e) {
     status.textContent = '❌ 通信エラーが発生しました。';
   }
+}
+
+// ===== バックアップ =====
+function openBackup() {
+  document.getElementById('modal-backup').classList.add('open');
+  document.getElementById('backup-status').style.display = 'none';
+}
+function closeBackup() {
+  document.getElementById('modal-backup').classList.remove('open');
+}
+
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const d    = new Date();
+  const pad  = n => String(n).padStart(2, '0');
+  a.href     = url;
+  a.download = `mylog_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showBackupStatus(`✅ ${data.length}件のデータを書き出しました`);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type   = 'file';
+  input.accept = '.json';
+  input.onchange = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text     = await file.text();
+      const imported = JSON.parse(text);
+      if (!Array.isArray(imported)) throw new Error('不正なフォーマット');
+      const existIds = new Set(data.map(d => d.id));
+      const newItems = imported.filter(item => item.id && item.title && !existIds.has(item.id));
+      data = [...data, ...newItems];
+      save();
+      renderList();
+      showBackupStatus(`✅ ${newItems.length}件を追加しました（重複除く）`);
+    } catch(err) {
+      showBackupStatus('❌ 読み込みに失敗しました: ' + err.message, true);
+    }
+  };
+  input.click();
+}
+
+function showBackupStatus(msg, isError = false) {
+  const el = document.getElementById('backup-status');
+  el.textContent = msg;
+  el.style.color   = isError ? '#ff3b30' : '#34c759';
+  el.style.display = 'block';
 }
 
 // ===== バーコードスキャナー =====
