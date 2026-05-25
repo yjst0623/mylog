@@ -1612,6 +1612,10 @@ async function connectSpotify() {
   const challenge = await sha256Base64url(verifier);
   localStorage.setItem(SP_VERIFIER_KEY, verifier);
 
+  // iOS PWA対策: verifierとclientIdをstateパラメータにも埋め込む
+  // (PWAからSafariへコンテキストが切り替わってもlocalStorageに依存せず復元できる)
+  const state = btoa(JSON.stringify({ v: verifier, c: clientId }));
+
   const params = new URLSearchParams({
     client_id:             clientId,
     response_type:         'code',
@@ -1619,6 +1623,7 @@ async function connectSpotify() {
     code_challenge_method: 'S256',
     code_challenge:        challenge,
     scope:                 'user-read-recently-played user-library-read',
+    state:                 state,
   });
   window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
 }
@@ -1637,8 +1642,19 @@ async function handleSpotifyCallback() {
 
   window.history.replaceState({}, '', window.location.pathname);
 
-  const clientId = localStorage.getItem(SP_CLIENT_ID_KEY);
-  const verifier = localStorage.getItem(SP_VERIFIER_KEY);
+  let clientId = localStorage.getItem(SP_CLIENT_ID_KEY);
+  let verifier = localStorage.getItem(SP_VERIFIER_KEY);
+
+  // localStorage が取れない場合（iOS PWA → Safari コンテキスト切り替え）はstateから復元
+  if (!verifier || !clientId) {
+    try {
+      const stateData = JSON.parse(atob(params.get('state') || ''));
+      if (stateData.v) verifier = stateData.v;
+      if (stateData.c) clientId = stateData.c;
+      if (clientId) localStorage.setItem(SP_CLIENT_ID_KEY, clientId);
+    } catch(e) {}
+  }
+
   if (!clientId || !verifier) { alert('認証情報が見つかりません。もう一度お試しください。'); return; }
 
   try {
