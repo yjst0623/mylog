@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>My Log</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Log">
+<script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: rgba(245,245,247,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 16px 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #1d1d1f;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-spotify {
+    background: #1db954;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: -0.1px;
+    transition: opacity 0.15s;
+  }
+  .btn-spotify:active { opacity: 0.75; }
+  .btn-add {
+    background: #0066cc;
+    border: none;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 300;
+    transition: opacity 0.15s;
+  }
+  .btn-add:active { opacity: 0.75; }
+  .search-bar {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    background: rgba(118,118,128,0.12);
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    color: #1d1d1f;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .search-bar input:focus { background: rgba(118,118,128,0.16); }
+  .search-bar input::placeholder { color: #6e6e73; }
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6e6e73;
+    font-size: 14px;
+  }
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .chip {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #1d1d1f;
+    transition: all 0.18s;
+    letter-spacing: -0.1px;
+  }
+  .chip.active {
+    background: #1d1d1f;
+    border-color: #1d1d1f;
+    color: white;
+  }
+
+  /* ===== TABS ===== */
+  .tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(245,245,247,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    z-index: 100;
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0 14px;
+    cursor: pointer;
+    color: #6e6e73;
+    font-size: 10px;
+    font-weight: 500;
+    gap: 3px;
+    border: none;
+    background: none;
+    letter-spacing: 0.1px;
+    transition: color 0.15s;
+  }
+  .tab-item.active { color: #0066cc; }
+  .tab-icon { font-size: 22px; }
+
+  /* ===== SCREEN ===== */
+  .screen { display: none; padding-bottom: 90px; }
+  .screen.active { display: block; }
+
+  /* ===== LIST ===== */
+  .list {
+    background: white;
+    margin: 16px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:active { background: #f5f5f7; }
+  .type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .type-icon.music   { background: linear-gradient(135deg, rgba(175,82,222,0.18) 0%, rgba(175,82,222,0.08) 100%); }
+  .type-icon.book    { background: linear-gradient(135deg, rgba(255,149,0,0.18) 0%, rgba(255,149,0,0.08) 100%); }
+  .type-icon.movie   { background: linear-gradient(135deg, rgba(0,102,204,0.18) 0%, rgba(0,102,204,0.08) 100%); }
+  .type-icon.podcast { background: linear-gradient(135deg, rgba(52,199,89,0.18) 0%, rgba(52,199,89,0.08) 100%); }
+  .item-info { flex: 1; min-width: 0; }
+  .item-title {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.2px;
+    color: #1d1d1f;
+  }
+  .item-sub {
+    font-size: 13px;
+    color: #6e6e73;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .item-meta { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+  .stars { display: flex; gap: 1px; }
+  .star { font-size: 10px; }
+  .item-date { font-size: 11px; color: #aeaeb2; }
+  .chevron { color: #c7c7cc; font-size: 16px; font-weight: 300; }
+
+  /* ===== EMPTY ===== */
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 14px;
+    color: #6e6e73;
+  }
+  .empty-icon { font-size: 64px; opacity: 0.6; }
+  .empty h3 { font-size: 20px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.3px; }
+  .empty p { font-size: 15px; text-align: center; line-height: 1.5; }
+  .btn-primary {
+    margin-top: 6px;
+    padding: 12px 28px;
+    background: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: -0.1px;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:active { opacity: 0.75; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #f5f5f7;
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp 0.32s cubic-bezier(0.32,0,0.15,1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 18px 14px;
+    background: rgba(245,245,247,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-radius: 24px 24px 0 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+  }
+  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+  .btn-cancel { color: #0066cc; background: none; border: none; font-size: 16px; cursor: pointer; font-family: inherit; }
+  .btn-save { color: #0066cc; background: none; border: none; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-save:disabled { color: #aeaeb2; }
+
+  /* ===== FORM ===== */
+  .form-section { margin: 14px 16px; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6e6e73;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+  .form-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .form-row {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    gap: 12px;
+  }
+  .form-row:last-child { border-bottom: none; }
+  .form-label { font-size: 16px; color: #1d1d1f; min-width: 70px; flex-shrink: 0; font-weight: 400; }
+  .form-row input, .form-row select {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    text-align: right;
+    color: #1d1d1f;
+    background: transparent;
+    font-family: inherit;
+  }
+  .form-row input::placeholder { color: #c7c7cc; }
+  .form-row select { cursor: pointer; color: #6e6e73; }
+  textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-family: inherit;
+    resize: none;
+    background: white;
+    color: #1d1d1f;
+    min-height: 90px;
+    border-radius: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  textarea::placeholder { color: #c7c7cc; }
+
+  /* タイプセレクター */
+  .type-selector {
+    display: flex;
+    gap: 0;
+    background: rgba(118,118,128,0.12);
+    border-radius: 12px;
+    padding: 3px;
+    margin: 14px 16px;
+  }
+  .type-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #1d1d1f;
+    transition: all 0.18s;
+    font-family: inherit;
+  }
+  .type-btn.active {
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
+    font-weight: 600;
+  }
+
+  /* 星評価 */
+  .rating-row {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    gap: 12px;
+  }
+  .rating-stars-edit { display: flex; gap: 4px; margin-left: auto; }
+  .rating-stars-edit span { font-size: 26px; cursor: pointer; }
+
+  /* ===== DETAIL ===== */
+  .detail-header {
+    background: white;
+    margin: 16px;
+    border-radius: 20px;
+    padding: 22px 18px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .detail-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+  .detail-icon.music   { background: linear-gradient(135deg, rgba(175,82,222,0.2) 0%, rgba(175,82,222,0.08) 100%); }
+  .detail-icon.book    { background: linear-gradient(135deg, rgba(255,149,0,0.2) 0%, rgba(255,149,0,0.08) 100%); }
+  .detail-icon.movie   { background: linear-gradient(135deg, rgba(0,102,204,0.2) 0%, rgba(0,102,204,0.08) 100%); }
+  .detail-icon.podcast { background: linear-gradient(135deg, rgba(52,199,89,0.2) 0%, rgba(52,199,89,0.08) 100%); }
+  .detail-type { font-size: 12px; color: #6e6e73; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .detail-title { font-size: 21px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; line-height: 1.2; }
+  .detail-stars { display: flex; gap: 2px; }
+  .detail-stars span { font-size: 16px; }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-size: 16px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: #1d1d1f; font-weight: 400; }
+  .info-val { color: #6e6e73; text-align: right; flex: 1; margin-left: 12px; }
+  .memo-text { padding: 14px 16px; font-size: 16px; line-height: 1.6; color: #1d1d1f; }
+  .btn-delete {
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+    padding: 15px;
+    background: white;
+    border: none;
+    border-radius: 16px;
+    color: #ff3b30;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    transition: opacity 0.15s;
+  }
+  .btn-delete:active { opacity: 0.7; }
+  .btn-back {
+    background: none;
+    border: none;
+    color: #0066cc;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 20px;
+    font-family: inherit;
+    font-weight: 400;
+  }
+
+  /* ===== STATS ===== */
+  .stats-header { padding: 20px 20px 0; }
+  .stats-header h2 { font-size: 34px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 14px 4px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .stat-num { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .stat-lbl { font-size: 11px; color: #6e6e73; margin-top: 3px; font-weight: 500; }
+  .stat-num.all   { color: #0066cc; }
+  .stat-num.music { color: #af52de; }
+  .stat-num.book  { color: #ff9500; }
+  .stat-num.movie { color: #0066cc; }
+  .year-section { margin: 16px; }
+  .year-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .year-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+  /* ===== SPOTIFY ===== */
+  .spotify-setup-content { padding: 28px 22px; }
+  .spotify-logo { font-size: 52px; text-align: center; margin-bottom: 10px; }
+  .spotify-setup-content h2 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .spotify-setup-content p { font-size: 15px; color: #3a3a3c; line-height: 1.65; margin-bottom: 18px; }
+  .step-list { list-style: none; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    background: #1db954;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-list li code {
+    background: rgba(118,118,128,0.12);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 13px;
+  }
+  .spotify-input {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 14px;
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 12px;
+    font-family: 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.5px;
+    background: white;
+    transition: border-color 0.15s;
+  }
+  .spotify-input:focus { border-color: #1db954; }
+  .btn-spotify-full {
+    width: 100%;
+    padding: 15px;
+    background: #1db954;
+    color: white;
+    border: none;
+    border-radius: 26px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn-spotify-full:disabled { background: #aeaeb2; }
+  .btn-spotify-full:active { opacity: 0.8; }
+  .divider { border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 22px 0; }
+
+  /* Spotifyインポートリスト */
+  .spotify-track-list { padding: 0 14px 14px; }
+  .spotify-track-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: opacity 0.12s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .spotify-track-item:active { opacity: 0.7; }
+  .spotify-track-item.selected { background: #edfaf3; border: 1.5px solid #1db954; }
+  .track-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(118,118,128,0.12);
+    flex-shrink: 0;
+  }
+  .track-info { flex: 1; min-width: 0; }
+  .track-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.1px; }
+  .track-artist { font-size: 13px; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .track-album { font-size: 12px; color: #aeaeb2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-check { font-size: 22px; flex-shrink: 0; }
+  .spotify-import-footer {
+    position: sticky;
+    bottom: 0;
+    background: rgba(245,245,247,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 14px 18px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .import-count { font-size: 13px; color: #6e6e73; text-align: center; margin-bottom: 10px; font-weight: 500; }
+  .btn-import {
+    width: 100%;
+    padding: 15px;
+    background: #1db954;
+    color: white;
+    border: none;
+    border-radius: 26px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn-import:disabled { background: #aeaeb2; }
+  .btn-import:active { opacity: 0.8; }
+  .loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 18px;
+    color: #6e6e73;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(118,118,128,0.2);
+    border-top-color: #1db954;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .already-badge {
+    font-size: 11px;
+    background: rgba(118,118,128,0.12);
+    color: #6e6e73;
+    padding: 3px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(29,29,31,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: white;
+    padding: 11px 22px;
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    animation: fadeInOut 2.4s ease forwards;
+    white-space: nowrap;
+    letter-spacing: -0.1px;
+  }
+  @keyframes fadeInOut {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  /* ===== GROUP BAR ===== */
+  .group-bar {
+    display: none;
+    padding: 0 0 12px;
+  }
+  .group-bar.visible { display: block; }
+  .group-selector {
+    display: flex;
+    background: rgba(118,118,128,0.12);
+    border-radius: 10px;
+    padding: 2px;
+  }
+  .group-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #1d1d1f;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .group-btn.active {
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
+    font-weight: 600;
+  }
+  .list-group-header {
+    padding: 18px 20px 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1d1d1f;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .list-group-count {
+    font-size: 12px;
+    font-weight: 400;
+    color: #aeaeb2;
+  }
+  .group-chevron {
+    font-size: 12px;
+    color: #aeaeb2;
+    margin-right: 2px;
+    transition: transform 0.15s;
+  }
+  .list-group-header:active { opacity: 0.6; }
+
+  /* ===== SCANNER ===== */
+  .scanner-frame {
+    width: 260px;
+    height: 110px;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+  }
+  .scanner-frame::before, .scanner-frame::after,
+  .scanner-frame > .sf-br, .scanner-frame > .sf-bl {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: white;
+    border-style: solid;
+  }
+  .scanner-frame::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 10px 0 0 0; }
+  .scanner-frame::after  { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 10px 0 0; }
+  .scanner-frame > .sf-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 10px; }
+  .scanner-frame > .sf-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 10px 0; }
+  .scanner-line {
+    position: absolute;
+    left: 6px; right: 6px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #0066cc, transparent);
+    border-radius: 2px;
+    animation: scanLine 2s ease-in-out infinite;
+    top: 0;
+  }
+  @keyframes scanLine {
+    0%   { top: 8px; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: calc(100% - 8px); opacity: 0; }
+  }
+
+  .spotify-connected-badge {
+    font-size: 11px;
+    background: #edfaf3;
+    color: #1db954;
+    padding: 3px 9px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ログ画面 ===== -->
+<div id="screen-log" class="screen active">
+  <div class="header">
+    <div class="header-top">
+      <h1>My Log</h1>
+      <div class="header-actions">
+        <button class="btn-spotify" onclick="onSpotifyBtn()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          Spotify
+        </button>
+        <button class="btn-add" onclick="openAdd()">＋</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="タイトル・アーティスト・著者を検索" oninput="renderList()">
+    </div>
+    <div class="filter-bar" id="filter-bar">
+      <button class="chip active" data-type="all" onclick="setFilter('all')">すべて</button>
+      <button class="chip" data-type="music"   onclick="setFilter('music')">🎵 音楽</button>
+      <button class="chip" data-type="podcast" onclick="setFilter('podcast')">🎙️ ポッドキャスト</button>
+      <button class="chip" data-type="book"    onclick="setFilter('book')">📚 本</button>
+      <button class="chip" data-type="movie"   onclick="setFilter('movie')">🎬 映画</button>
+    </div>
+    <div class="group-bar" id="group-bar">
+      <div class="group-selector">
+        <button class="group-btn active" data-group="date"   onclick="setMusicGroup('date')">日付順</button>
+        <button class="group-btn"        data-group="artist" onclick="setMusicGroup('artist')">アーティスト</button>
+        <button class="group-btn"        data-group="album"  onclick="setMusicGroup('album')">アルバム</button>
+      </div>
+    </div>
+  </div>
+  <div id="list-container"></div>
+</div>
+
+<!-- ===== 統計画面 ===== -->
+<div id="screen-stats" class="screen">
+  <div class="stats-header">
+    <h2>統計</h2>
+  </div>
+  <div id="stats-container"></div>
+</div>
+
+<!-- ===== 詳細画面 ===== -->
+<div id="screen-detail" class="screen">
+  <div id="detail-container"></div>
+</div>
+
+<!-- ===== タブバー ===== -->
+<div class="tab-bar">
+  <button class="tab-item active" id="tab-log" onclick="switchTab('log')">
+    <span class="tab-icon">📋</span>ログ
+  </button>
+  <button class="tab-item" id="tab-stats" onclick="switchTab('stats')">
+    <span class="tab-icon">📊</span>統計
+  </button>
+</div>
+
+<!-- ===== 追加モーダル ===== -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="btn-cancel" onclick="closeAdd()">キャンセル</button>
+      <span class="modal-title">記録を追加</span>
+      <button class="btn-save" id="btn-save-add" onclick="saveAdd()" disabled>保存</button>
+    </div>
+    <div class="type-selector">
+      <button class="type-btn active" data-type="music"   onclick="selectType('music')">🎵 音楽</button>
+      <button class="type-btn" data-type="book"           onclick="selectType('book')">📚 本</button>
+      <button class="type-btn" data-type="movie"          onclick="selectType('movie')">🎬 映画</button>
+      <button class="type-btn" data-type="podcast"        onclick="selectType('podcast')">🎙️ Pod</button>
+    </div>
+    <div class="form-section">
+      <div class="section-label">基本情報</div>
+      <div class="form-card">
+        <div class="form-row">
+          <label class="form-label">タイトル</label>
+          <input type="text" id="add-title" placeholder="必須" oninput="checkSaveAdd()">
+        </div>
+        <div class="form-row">
+          <label class="form-label">日付</label>
+          <input type="date" id="add-date">
+        </div>
+        <div class="rating-row">
+          <span class="form-label">評価</span>
+          <div class="rating-stars-edit" id="add-rating-stars"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section" id="add-type-fields"></div>
+    <div class="form-section">
+      <div class="section-label">メモ（任意）</div>
+      <textarea id="add-memo" placeholder="自由にメモを書いてください..." rows="3"></textarea>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ===== 編集モーダル ===== -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="btn-cancel" onclick="closeEdit()">キャンセル</button>
+      <span class="modal-title">編集</span>
+      <button class="btn-save" id="btn-save-edit" onclick="saveEdit()">保存</button>
+    </div>
+    <div class="form-section">
+      <div class="section-label">基本情報</div>
+      <div class="form-card">
+        <div class="form-row">
+          <label class="form-label">タイトル</label>
+          <input type="text" id="edit-title" oninput="checkSaveEdit()">
+        </div>
+        <div class="form-row">
+          <label class="form-label">日付</label>
+          <input type="date" id="edit-date">
+        </div>
+        <div class="rating-row">
+          <span class="form-label">評価</span>
+          <div class="rating-stars-edit" id="edit-rating-stars"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section" id="edit-type-fields"></div>
+    <div class="form-section">
+      <div class="section-label">メモ（任意）</div>
+      <textarea id="edit-memo" rows="3"></textarea>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ===== Spotify設定モーダル ===== -->
+<div class="modal-overlay" id="modal-spotify-setup">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="btn-cancel" onclick="closeSpotifySetup()">閉じる</button>
+      <span class="modal-title">Spotify連携</span>
+      <span></span>
+    </div>
+    <div class="spotify-setup-content">
+      <div class="spotify-logo">🎵</div>
+      <h2>Spotifyと連携する</h2>
+      <p>最近聴いた曲（最大50曲）をMy Logにインポートできます。<br>初回のみ下記の設定が必要です。</p>
+
+      <ol class="step-list">
+        <li><strong>ターミナル</strong>でこのコマンドを実行してサーバーを起動:<br>
+          <code>cd ~/Desktop/Claude/MyLog && python3 -m http.server 3000</code>
+        </li>
+        <li><strong>このページを</strong> <code>http://localhost:3000</code> で開き直す</li>
+        <li><a href="https://developer.spotify.com/dashboard" target="_blank" style="color:#1db954">developer.spotify.com/dashboard</a> でログイン → 「Create app」</li>
+        <li>App名は何でもOK。<strong>Redirect URI</strong> に <code>http://localhost:3000</code> を追加して保存</li>
+        <li>アプリの「Settings」から <strong>Client ID</strong> をコピー</li>
+      </ol>
+
+      <hr class="divider">
+
+      <div class="section-label" style="margin-bottom:8px">Client ID を入力</div>
+      <input type="text" class="spotify-input" id="spotify-client-id-input"
+             placeholder="例: 1a2b3c4d5e6f..." maxlength="32">
+      <button class="btn-spotify-full" id="btn-connect-spotify" onclick="connectSpotify()" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        Spotifyにログインして連携
+      </button>
+      <div style="height:8px"></div>
+      <div id="spotify-status-msg" style="font-size:13px;color:#8e8e93;text-align:center"></div>
+
+      <div id="spotify-connected-section" style="display:none; margin-top:16px">
+        <hr class="divider">
+        <button class="btn-spotify-full" onclick="fetchSpotifyTracks()">
+          最近聴いた曲を読み込む
+        </button>
+        <div style="height:8px"></div>
+        <button onclick="disconnectSpotify()" style="width:100%;padding:12px;background:none;border:none;color:#ff3b30;font-size:15px;cursor:pointer">
+          連携を解除する
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== バーコードスキャナーモーダル ===== -->
+<div class="modal-overlay" id="modal-scanner" style="background:rgba(0,0,0,0.92);align-items:center">
+  <div style="width:100%;max-width:430px;position:relative">
+    <video id="scanner-video" playsinline autoplay muted style="width:100%;display:block;max-height:70vh;object-fit:cover"></video>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+      <div class="scanner-frame"></div>
+      <p style="color:white;font-size:14px;font-weight:500;margin-top:20px;text-shadow:0 1px 4px rgba(0,0,0,0.6)">バーコードを枠内に合わせてください</p>
+    </div>
+    <div style="position:absolute;top:0;left:0;right:0;padding:20px;display:flex;justify-content:flex-end">
+      <button onclick="closeBarcodeScanner()" style="background:rgba(0,0,0,0.5);border:none;color:white;font-size:15px;font-weight:600;padding:8px 18px;border-radius:20px;cursor:pointer;backdrop-filter:blur(10px)">✕ 閉じる</button>
+    </div>
+    <div id="scanner-status" style="position:absolute;bottom:28px;left:0;right:0;text-align:center;color:white;font-size:14px;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,0.6)"></div>
+  </div>
+</div>
+
+<!-- ===== Spotifyインポートモーダル ===== -->
+<div class="modal-overlay" id="modal-spotify-import">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="btn-cancel" onclick="closeSpotifyImport()">キャンセル</button>
+      <span class="modal-title">最近聴いた曲</span>
+      <button class="btn-cancel" onclick="toggleSelectAll()" id="btn-select-all">すべて選択</button>
+    </div>
+    <div id="spotify-tracks-container"></div>
+    <div class="spotify-import-footer">
+      <div class="import-count" id="import-count-label">0件選択</div>
+      <button class="btn-import" id="btn-do-import" onclick="importSelected()" disabled>
+        My Log に追加
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== データ =====
+const STORAGE_KEY = 'mylog_v1';
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let currentFilter = 'all';
+let musicGroupBy   = 'artist';
+let bookGroupBy    = 'date';
+let podcastGroupBy = 'date';
+let expandedGroups = new Set();
+let currentDetailId = null;
+let addRating = 3;
+let editRating = 3;
+let addType = 'music';
+let editId = null;
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+// ===== タブ =====
+function switchTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'stats') renderStats();
+}
+
+// ===== フィルタ =====
+function setFilter(type) {
+  currentFilter = type;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.chip[data-type="${type}"]`).classList.add('active');
+  const groupBar = document.getElementById('group-bar');
+  const sel = groupBar.querySelector('.group-selector');
+  if (type === 'music') {
+    groupBar.classList.add('visible');
+    sel.innerHTML = `
+      <button class="group-btn ${musicGroupBy==='artist'?'active':''}" data-group="artist" onclick="setMusicGroup('artist')">アーティスト</button>
+      <button class="group-btn ${musicGroupBy==='album'?'active':''}"  data-group="album"  onclick="setMusicGroup('album')">アルバム</button>
+      <button class="group-btn ${musicGroupBy==='date'?'active':''}"   data-group="date"   onclick="setMusicGroup('date')">日付順</button>`;
+  } else if (type === 'book') {
+    groupBar.classList.add('visible');
+    sel.innerHTML = `
+      <button class="group-btn ${bookGroupBy==='date'?'active':''}"   data-group="date"   onclick="setBookGroup('date')">日付順</button>
+      <button class="group-btn ${bookGroupBy==='author'?'active':''}" data-group="author" onclick="setBookGroup('author')">著者別</button>`;
+  } else if (type === 'podcast') {
+    groupBar.classList.add('visible');
+    sel.innerHTML = `
+      <button class="group-btn ${podcastGroupBy==='date'?'active':''}"     data-group="date"     onclick="setPodcastGroup('date')">日付順</button>
+      <button class="group-btn ${podcastGroupBy==='showName'?'active':''}" data-group="showName" onclick="setPodcastGroup('showName')">番組別</button>`;
+  } else {
+    groupBar.classList.remove('visible');
+  }
+  renderList();
+}
+
+function setMusicGroup(group) {
+  musicGroupBy = group; expandedGroups.clear();
+  document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.group-btn[data-group="${group}"]`).classList.add('active');
+  renderList();
+}
+
+function setBookGroup(group) {
+  bookGroupBy = group; expandedGroups.clear();
+  document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.group-btn[data-group="${group}"]`).classList.add('active');
+  renderList();
+}
+
+function setPodcastGroup(group) {
+  podcastGroupBy = group; expandedGroups.clear();
+  document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.group-btn[data-group="${group}"]`).classList.add('active');
+  renderList();
+}
+
+function toggleGroup(idx) {
+  if (expandedGroups.has(idx)) expandedGroups.delete(idx);
+  else expandedGroups.add(idx);
+  renderList();
+}
+
+// ===== 一覧 =====
+const TYPE_ICON = { music: '🎵', book: '📚', movie: '🎬', podcast: '🎙️' };
+const TYPE_NAME = { music: '音楽', book: '本', movie: '映画', podcast: 'ポッドキャスト' };
+
+function getSubtitle(item) {
+  if (item.type === 'music')   return [item.artist, item.album].filter(Boolean).join(' / ');
+  if (item.type === 'book')    return item.author || '';
+  if (item.type === 'movie')   return [item.director, item.releaseYear ? item.releaseYear + '年' : ''].filter(Boolean).join(' / ');
+  if (item.type === 'podcast') return item.showName || '';
+  return '';
+}
+
+function starsHtml(rating, size = 10) {
+  return Array.from({length:5}, (_,i) =>
+    `<span class="star" style="font-size:${size}px">${i < rating ? '⭐' : '☆'}</span>`
+  ).join('');
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+function renderListItem(item, groupBy) {
+  let sub = '';
+  if (item.type === 'music') {
+    if (groupBy === 'artist') sub = item.album || '';
+    else if (groupBy === 'album') sub = item.artist || '';
+    else sub = [item.artist, item.album].filter(Boolean).join(' / ');
+  } else if (item.type === 'book') {
+    if (groupBy === 'author') sub = item.publisher || '';
+    else sub = item.author || '';
+  } else if (item.type === 'podcast') {
+    if (groupBy === 'showName') sub = '';
+    else sub = item.showName || '';
+  } else {
+    sub = getSubtitle(item);
+  }
+  return `
+    <div class="list-item" onclick="openDetail('${item.id}')">
+      <div class="type-icon ${item.type}">${TYPE_ICON[item.type]}</div>
+      <div class="item-info">
+        <div class="item-title">${escHtml(item.title)}</div>
+        ${sub ? `<div class="item-sub">${escHtml(sub)}</div>` : ''}
+        <div class="item-meta">
+          <div class="stars">${starsHtml(item.rating)}</div>
+          <span style="color:#c7c7cc;font-size:10px">·</span>
+          <span class="item-date">${formatDate(item.date)}</span>
+        </div>
+      </div>
+      <span class="chevron">›</span>
+    </div>`;
+}
+
+function renderList() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let items = data
+    .filter(item => currentFilter === 'all' || item.type === currentFilter)
+    .filter(item => !q || item.title.toLowerCase().includes(q)
+                      || (item.artist||'').toLowerCase().includes(q)
+                      || (item.author||'').toLowerCase().includes(q))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  const container = document.getElementById('list-container');
+  if (items.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🗂️</div>
+        <h3>${q ? '該当する記録なし' : 'まだ記録がありません'}</h3>
+        <p>${q ? '別のキーワードで検索してみてください' : '＋ボタンから記録を追加しましょう'}</p>
+        ${!q ? '<button class="btn-primary" onclick="openAdd()">最初の記録を追加</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  // グループ表示（音楽 or 本）
+  const groupKey  = currentFilter === 'music' ? musicGroupBy : currentFilter === 'book' ? bookGroupBy : currentFilter === 'podcast' ? podcastGroupBy : 'date';
+  const groupUnit = currentFilter === 'music' ? '曲' : currentFilter === 'podcast' ? '件' : '冊';
+  if ((currentFilter === 'music' || currentFilter === 'book' || currentFilter === 'podcast') && groupKey !== 'date') {
+    const groups = {};
+    const order = [];
+    items.forEach(item => {
+      const g = item[groupKey] || '（不明）';
+      if (!groups[g]) { groups[g] = []; order.push(g); }
+      groups[g].push(item);
+    });
+    // 著者別・番組別は名前でソート
+    const sortedOrder = (groupKey === 'author' || groupKey === 'showName')
+      ? [...order].sort((a,b) => a.localeCompare(b, 'ja')) : order;
+    container.innerHTML = sortedOrder.map((g, i) => {
+      const isOpen = expandedGroups.has(i);
+      return `
+        <div class="list-group-header" onclick="toggleGroup(${i})" style="cursor:pointer">
+          <span class="group-chevron">${isOpen ? '▾' : '▸'}</span>
+          ${escHtml(g)}
+          <span class="list-group-count">${groups[g].length}${groupUnit}</span>
+        </div>
+        ${isOpen ? `<div class="list" style="margin:0 16px 8px">
+          ${groups[g].map(item => renderListItem(item, groupKey)).join('')}
+        </div>` : ''}`;
+    }).join('');
+    return;
+  }
+
+  // 通常フラットリスト
+  container.innerHTML = `<div class="list" style="margin:16px">` +
+    items.map(item => renderListItem(item, 'date')).join('') + `</div>`;
+}
+
+// ===== 詳細 =====
+function openDetail(id) {
+  currentDetailId = id;
+  renderDetail();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-detail').classList.add('active');
+}
+
+function renderDetail() {
+  const item = data.find(d => d.id === currentDetailId);
+  if (!item) return;
+  let typeFields = '';
+  if (item.type === 'music') {
+    if (item.artist || item.album) {
+      typeFields = `<div class="form-section"><div class="section-label">音楽情報</div><div class="form-card">
+        ${item.artist ? `<div class="info-row"><span class="info-key">アーティスト</span><span class="info-val">${escHtml(item.artist)}</span></div>` : ''}
+        ${item.album  ? `<div class="info-row"><span class="info-key">アルバム</span><span class="info-val">${escHtml(item.album)}</span></div>` : ''}
+      </div></div>`;
+    }
+  } else if (item.type === 'book') {
+    typeFields = `<div class="form-section"><div class="section-label">本の情報</div><div class="form-card">
+      ${item.author        ? `<div class="info-row"><span class="info-key">著者</span><span class="info-val">${escHtml(item.author)}</span></div>` : ''}
+      ${item.publisher     ? `<div class="info-row"><span class="info-key">出版社</span><span class="info-val">${escHtml(item.publisher)}</span></div>` : ''}
+      ${item.publishedDate ? `<div class="info-row"><span class="info-key">発売日</span><span class="info-val">${escHtml(item.publishedDate)}</span></div>` : ''}
+      <div class="info-row"><span class="info-key">読書状態</span><span class="info-val">${escHtml(item.status||'未読')}</span></div>
+    </div></div>`;
+  } else if (item.type === 'movie') {
+    typeFields = `<div class="form-section"><div class="section-label">映画・ドラマ情報</div><div class="form-card">
+      ${item.subtype     ? `<div class="info-row"><span class="info-key">種類</span><span class="info-val">${escHtml(item.subtype)}</span></div>` : ''}
+      ${item.director    ? `<div class="info-row"><span class="info-key">監督・制作</span><span class="info-val">${escHtml(item.director)}</span></div>` : ''}
+      ${item.releaseYear ? `<div class="info-row"><span class="info-key">公開年</span><span class="info-val">${item.releaseYear}年</span></div>` : ''}
+      ${item.platform    ? `<div class="info-row"><span class="info-key">配信先</span><span class="info-val">${escHtml(item.platform)}</span></div>` : ''}
+      <div class="info-row"><span class="info-key">視聴方法</span><span class="info-val">${escHtml(item.watchMethod||'配信')}</span></div>
+    </div></div>`;
+  } else if (item.type === 'podcast') {
+    if (item.showName) {
+      typeFields = `<div class="form-section"><div class="section-label">ポッドキャスト情報</div><div class="form-card">
+        <div class="info-row"><span class="info-key">番組名</span><span class="info-val">${escHtml(item.showName)}</span></div>
+      </div></div>`;
+    }
+  }
+  document.getElementById('detail-container').innerHTML = `
+    <button class="btn-back" onclick="backToList()">‹ 戻る</button>
+    <div class="detail-header">
+      <div class="detail-icon ${item.type}">${TYPE_ICON[item.type]}</div>
+      <div>
+        <div class="detail-type">${TYPE_NAME[item.type]}</div>
+        <div class="detail-title">${escHtml(item.title)}</div>
+        <div class="detail-stars">${starsHtml(item.rating, 16)}</div>
+      </div>
+    </div>
+    <div class="form-section"><div class="section-label">記録日</div>
+      <div class="form-card"><div class="info-row"><span class="info-val" style="text-align:left">${formatDate(item.date)}</span></div></div>
+    </div>
+    ${typeFields}
+    ${item.memo ? `<div class="form-section"><div class="section-label">メモ</div><div class="form-card"><div class="memo-text">${escHtml(item.memo)}</div></div></div>` : ''}
+    <div style="margin-top:8px">
+      <button class="btn-primary" style="width:calc(100% - 24px);margin:0 12px 8px;padding:14px;border-radius:12px;font-size:17px;font-weight:400" onclick="openEdit('${item.id}')">編集</button>
+      <button class="btn-delete" onclick="deleteItem('${item.id}')">この記録を削除</button>
+    </div>`;
+}
+
+function backToList() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-log').classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-log').classList.add('active');
+}
+
+function deleteItem(id) {
+  const item = data.find(d => d.id === id);
+  if (!item) return;
+  if (!confirm(`「${item.title}」を削除しますか？`)) return;
+  data = data.filter(d => d.id !== id);
+  save(); renderList(); backToList();
+}
+
+// ===== 追加 =====
+function openAdd() {
+  addType = 'music'; addRating = 3;
+  document.getElementById('add-title').value = '';
+  document.getElementById('add-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('add-memo').value = '';
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.type-btn[data-type="music"]').classList.add('active');
+  renderAddRating(); renderTypeFields('add', 'music'); checkSaveAdd();
+  document.getElementById('modal-add').classList.add('open');
+  setTimeout(() => document.getElementById('add-title').focus(), 300);
+}
+function closeAdd() { document.getElementById('modal-add').classList.remove('open'); }
+function selectType(type) {
+  addType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+  renderTypeFields('add', type);
+}
+function renderAddRating() {
+  document.getElementById('add-rating-stars').innerHTML = Array.from({length:5}, (_,i) =>
+    `<span onclick="setAddRating(${i+1})" style="cursor:pointer;font-size:26px">${i < addRating ? '⭐' : '☆'}</span>`
+  ).join('');
+}
+function setAddRating(r) { addRating = r; renderAddRating(); }
+function renderEditRating() {
+  document.getElementById('edit-rating-stars').innerHTML = Array.from({length:5}, (_,i) =>
+    `<span onclick="setEditRating(${i+1})" style="cursor:pointer;font-size:26px">${i < editRating ? '⭐' : '☆'}</span>`
+  ).join('');
+}
+function setEditRating(r) { editRating = r; renderEditRating(); }
+function renderTypeFields(prefix, type) {
+  const container = document.getElementById(`${prefix}-type-fields`);
+  if (type === 'music') {
+    container.innerHTML = `<div class="section-label">音楽情報</div><div class="form-card">
+      <div class="form-row"><label class="form-label">アーティスト</label><input type="text" id="${prefix}-artist" placeholder="任意"></div>
+      <div class="form-row"><label class="form-label">アルバム</label><input type="text" id="${prefix}-album" placeholder="任意"></div>
+    </div>`;
+  } else if (type === 'book') {
+    container.innerHTML = `
+      <div class="section-label">ISBNで自動入力</div>
+      <div class="form-card">
+        <div class="form-row" style="gap:6px">
+          <button onclick="openBarcodeScanner('${prefix}')"
+            style="background:#f5f5f7;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:6px 10px;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1">
+            📷
+          </button>
+          <span style="font-size:16px;color:#6e6e73;flex-shrink:0;letter-spacing:0.5px;font-weight:500">9784</span>
+          <input type="text" id="${prefix}-isbn" placeholder="続きを入力（9桁）" inputmode="numeric"
+            maxlength="9"
+            style="flex:1;border:none;outline:none;font-size:16px;background:transparent"
+            oninput="this.value=this.value.replace(/[^0-9X]/g,'')"
+            onkeydown="if(event.key==='Enter')lookupISBN('${prefix}')">
+          <button onclick="lookupISBN('${prefix}')"
+            style="background:#0066cc;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            検索
+          </button>
+        </div>
+        <div id="${prefix}-isbn-status" style="font-size:12px;color:#8e8e93;padding:0 16px 10px;display:none"></div>
+      </div>
+      <div class="section-label" style="margin-top:12px">本の情報</div>
+      <div class="form-card">
+        <div class="form-row"><label class="form-label">著者</label><input type="text" id="${prefix}-author" placeholder="任意"></div>
+        <div class="form-row"><label class="form-label">出版社</label><input type="text" id="${prefix}-publisher" placeholder="任意"></div>
+        <div class="form-row"><label class="form-label">発売日</label><input type="text" id="${prefix}-publisheddate" placeholder="例: 2024-01-01"></div>
+        <div class="form-row"><label class="form-label">読書状態</label>
+          <select id="${prefix}-status"><option value="未読">未読</option><option value="読書中">読書中</option><option value="読了" selected>読了</option></select>
+        </div>
+      </div>`;
+  } else if (type === 'movie') {
+    container.innerHTML = `
+      <div class="section-label">タイトルで自動入力</div>
+      <div class="form-card">
+        <div class="form-row" style="gap:8px">
+          <input type="text" id="${prefix}-search-title" placeholder="例: 九条の大罪"
+            style="flex:1;border:none;outline:none;font-size:16px;background:transparent"
+            onkeydown="if(event.key==='Enter')lookupTitle('${prefix}')">
+          <button onclick="lookupTitle('${prefix}')"
+            style="background:#007aff;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">
+            検索
+          </button>
+        </div>
+        <div id="${prefix}-search-status" style="padding:0 16px 10px;display:none"></div>
+      </div>
+      <div class="section-label" style="margin-top:12px">映画・ドラマ情報</div>
+      <div class="form-card">
+        <div class="form-row">
+          <label class="form-label">種類</label>
+          <select id="${prefix}-subtype">
+            <option value="映画">映画</option>
+            <option value="TVドラマ">TVドラマ</option>
+            <option value="アニメ">アニメ</option>
+            <option value="ドキュメンタリー">ドキュメンタリー</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">監督・制作</label><input type="text" id="${prefix}-director" placeholder="任意"></div>
+        <div class="form-row"><label class="form-label">公開年</label><input type="number" id="${prefix}-year" placeholder="例: 2024" min="1900" max="2099"></div>
+        <div class="form-row"><label class="form-label">配信先</label><input type="text" id="${prefix}-platform" placeholder="例: Netflix"></div>
+        <div class="form-row"><label class="form-label">視聴方法</label>
+          <select id="${prefix}-watchmethod"><option value="配信" selected>配信</option><option value="映画館">映画館</option><option value="その他">その他</option></select>
+        </div>
+      </div>`;
+  } else if (type === 'podcast') {
+    container.innerHTML = `<div class="section-label">ポッドキャスト情報</div><div class="form-card">
+      <div class="form-row"><label class="form-label">番組名</label><input type="text" id="${prefix}-showname" placeholder="任意"></div>
+    </div>`;
+  }
+}
+function checkSaveAdd() {
+  document.getElementById('btn-save-add').disabled = !document.getElementById('add-title').value.trim();
+}
+function saveAdd() {
+  const item = {
+    id: uid(), type: addType,
+    title: document.getElementById('add-title').value.trim(),
+    date: document.getElementById('add-date').value,
+    rating: addRating,
+    memo: document.getElementById('add-memo').value.trim(),
+    artist:'', album:'', author:'', status:'未読', director:'', releaseYear:'', watchMethod:'配信'
+  };
+  if (addType === 'music') { item.artist = val('add-artist'); item.album = val('add-album'); }
+  else if (addType === 'book') { item.author = val('add-author'); item.status = val('add-status') || '未読'; item.publisher = val('add-publisher'); item.publishedDate = val('add-publisheddate'); }
+  else if (addType === 'movie') { item.director = val('add-director'); item.releaseYear = val('add-year'); item.watchMethod = val('add-watchmethod') || '配信'; item.subtype = val('add-subtype') || '映画'; item.platform = val('add-platform'); }
+  else if (addType === 'podcast') { item.showName = val('add-showname'); }
+  data.push(item); save(); renderList(); closeAdd();
+}
+
+// ===== 編集 =====
+function openEdit(id) {
+  editId = id;
+  const item = data.find(d => d.id === id);
+  if (!item) return;
+  editRating = item.rating;
+  document.getElementById('edit-title').value = item.title;
+  document.getElementById('edit-date').value = item.date;
+  document.getElementById('edit-memo').value = item.memo || '';
+  renderEditRating(); renderTypeFields('edit', item.type);
+  if (item.type === 'music') { setVal('edit-artist', item.artist); setVal('edit-album', item.album); }
+  else if (item.type === 'book') { setVal('edit-author', item.author); setVal('edit-status', item.status); setVal('edit-publisher', item.publisher); setVal('edit-publisheddate', item.publishedDate); }
+  else if (item.type === 'movie') { setVal('edit-director', item.director); setVal('edit-year', item.releaseYear); setVal('edit-watchmethod', item.watchMethod); setVal('edit-subtype', item.subtype || '映画'); setVal('edit-platform', item.platform); }
+  else if (item.type === 'podcast') { setVal('edit-showname', item.showName); }
+  document.getElementById('modal-edit').classList.add('open');
+}
+function closeEdit() { document.getElementById('modal-edit').classList.remove('open'); }
+function checkSaveEdit() {
+  document.getElementById('btn-save-edit').disabled = !document.getElementById('edit-title').value.trim();
+}
+function saveEdit() {
+  const item = data.find(d => d.id === editId);
+  if (!item) return;
+  item.title = document.getElementById('edit-title').value.trim();
+  item.date = document.getElementById('edit-date').value;
+  item.rating = editRating;
+  item.memo = document.getElementById('edit-memo').value.trim();
+  if (item.type === 'music') { item.artist = val('edit-artist'); item.album = val('edit-album'); }
+  else if (item.type === 'book') { item.author = val('edit-author'); item.status = val('edit-status'); item.publisher = val('edit-publisher'); item.publishedDate = val('edit-publisheddate'); }
+  else if (item.type === 'movie') { item.director = val('edit-director'); item.releaseYear = val('edit-year'); item.watchMethod = val('edit-watchmethod'); item.subtype = val('edit-subtype') || '映画'; item.platform = val('edit-platform'); }
+  else if (item.type === 'podcast') { item.showName = val('edit-showname'); }
+  save(); renderDetail(); closeEdit();
+}
+
+// ===== 統計 =====
+function renderStats() {
+  const byYear = {};
+  data.forEach(item => {
+    const y = item.date ? item.date.slice(0,4) : '不明';
+    if (!byYear[y]) byYear[y] = [];
+    byYear[y].push(item);
+  });
+  function cards(items, cols = 4) {
+    const music = items.filter(i=>i.type==='music').length;
+    const book  = items.filter(i=>i.type==='book').length;
+    const movie = items.filter(i=>i.type==='movie').length;
+    if (cols === 4) return `<div class="stat-cards">
+      <div class="stat-card"><div class="stat-num all">${items.length}</div><div class="stat-lbl">合計</div></div>
+      <div class="stat-card"><div class="stat-num music">${music}</div><div class="stat-lbl">音楽</div></div>
+      <div class="stat-card"><div class="stat-num book">${book}</div><div class="stat-lbl">本</div></div>
+      <div class="stat-card"><div class="stat-num movie">${movie}</div><div class="stat-lbl">映画</div></div>
+    </div>`;
+    return `<div class="year-cards">
+      <div class="stat-card"><div class="stat-num music">${music}</div><div class="stat-lbl">音楽</div></div>
+      <div class="stat-card"><div class="stat-num book">${book}</div><div class="stat-lbl">本</div></div>
+      <div class="stat-card"><div class="stat-num movie">${movie}</div><div class="stat-lbl">映画</div></div>
+    </div>`;
+  }
+  let html = '';
+  if (data.length === 0) {
+    html = `<div class="empty"><div class="empty-icon">📊</div><h3>まだ記録がありません</h3></div>`;
+  } else {
+    html += `<div style="margin:0 12px 16px">
+      <div class="section-label" style="margin-bottom:8px">全期間（${data.length}件）</div>${cards(data,4)}</div>`;
+    Object.keys(byYear).sort((a,b)=>b-a).forEach(year => {
+      html += `<div class="year-section"><div class="year-title">${year}年（${byYear[year].length}件）</div>${cards(byYear[year],3)}</div>`;
+    });
+  }
+  document.getElementById('stats-container').innerHTML = html;
+}
+
+// ===== ユーティリティ =====
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// ============================================================
+// ===== SPOTIFY 連携 =====
+// ============================================================
+const SP_CLIENT_ID_KEY  = 'mylog_sp_client_id';
+const SP_TOKEN_KEY      = 'mylog_sp_token';
+const SP_VERIFIER_KEY   = 'mylog_sp_verifier';
+const SP_REDIRECT_URI   = 'https://helpful-pavlova-c7bb40.netlify.app';
+
+let spotifyToken    = localStorage.getItem(SP_TOKEN_KEY) || null;
+let spotifyClientId = localStorage.getItem(SP_CLIENT_ID_KEY) || '';
+let spotifyTracks   = [];          // [{id, name, artist, album, albumImg, playedAt}]
+let selectedTrackIds = new Set();
+
+// ---- PKCE ヘルパー ----
+function generateRandom(len = 64) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  let s = '';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  arr.forEach(v => s += chars[v % chars.length]);
+  return s;
+}
+async function sha256Base64url(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+// ---- Spotifyボタン押下 ----
+function onSpotifyBtn() {
+  const clientId = localStorage.getItem(SP_CLIENT_ID_KEY) || '';
+  const token    = localStorage.getItem(SP_TOKEN_KEY) || '';
+  document.getElementById('spotify-client-id-input').value = clientId;
+  document.getElementById('btn-connect-spotify').disabled = clientId.length < 20;
+  document.getElementById('spotify-status-msg').textContent = '';
+  updateSpotifySetupUI(!!token);
+  document.getElementById('modal-spotify-setup').classList.add('open');
+}
+function closeSpotifySetup() {
+  document.getElementById('modal-spotify-setup').classList.remove('open');
+}
+
+function updateSpotifySetupUI(connected) {
+  document.getElementById('spotify-connected-section').style.display = connected ? 'block' : 'none';
+  document.getElementById('btn-connect-spotify').textContent = connected
+    ? '✓ 連携済み（再認証）' : 'Spotifyにログインして連携';
+  if (!connected) {
+    document.getElementById('btn-connect-spotify').innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      Spotifyにログインして連携`;
+  }
+}
+
+// Client IDフォーム入力
+document.getElementById('spotify-client-id-input').addEventListener('input', function() {
+  document.getElementById('btn-connect-spotify').disabled = this.value.trim().length < 20;
+});
+
+// ---- 認証フロー開始 ----
+async function connectSpotify() {
+  const clientId = document.getElementById('spotify-client-id-input').value.trim();
+  if (!clientId) return;
+  localStorage.setItem(SP_CLIENT_ID_KEY, clientId);
+
+  const verifier  = generateRandom(64);
+  const challenge = await sha256Base64url(verifier);
+  localStorage.setItem(SP_VERIFIER_KEY, verifier);
+
+  const params = new URLSearchParams({
+    client_id:             clientId,
+    response_type:         'code',
+    redirect_uri:          SP_REDIRECT_URI,
+    code_challenge_method: 'S256',
+    code_challenge:        challenge,
+    scope:                 'user-read-recently-played user-library-read',
+  });
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+// ---- OAuthコールバック処理 ----
+async function handleSpotifyCallback() {
+  const params   = new URLSearchParams(window.location.search);
+  const code     = params.get('code');
+  const error    = params.get('error');
+  if (error) {
+    alert('Spotify認証がキャンセルされました');
+    window.history.replaceState({}, '', window.location.pathname);
+    return;
+  }
+  if (!code) return;
+
+  window.history.replaceState({}, '', window.location.pathname);
+
+  const clientId = localStorage.getItem(SP_CLIENT_ID_KEY);
+  const verifier = localStorage.getItem(SP_VERIFIER_KEY);
+  if (!clientId || !verifier) { alert('認証情報が見つかりません。もう一度お試しください。'); return; }
+
+  try {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:     clientId,
+        grant_type:    'authorization_code',
+        code,
+        redirect_uri:  SP_REDIRECT_URI,
+        code_verifier: verifier,
+      }),
+    });
+    const json = await res.json();
+    if (json.access_token) {
+      localStorage.setItem(SP_TOKEN_KEY, json.access_token);
+      spotifyToken = json.access_token;
+      localStorage.removeItem(SP_VERIFIER_KEY);
+      showToast('✅ Spotifyと連携しました！');
+      // すぐにトラック取得へ
+      setTimeout(fetchSpotifyTracks, 400);
+    } else {
+      alert('トークン取得に失敗しました: ' + (json.error_description || json.error || '不明なエラー'));
+    }
+  } catch(e) {
+    alert('通信エラーが発生しました。localhost:3000 で開いているか確認してください。');
+  }
+}
+
+// ---- 最近聴いた曲を取得 ----
+async function fetchSpotifyTracks() {
+  closeSpotifySetup();
+  const token = localStorage.getItem(SP_TOKEN_KEY);
+  if (!token) { alert('先にSpotifyと連携してください'); return; }
+
+  document.getElementById('modal-spotify-import').classList.add('open');
+  document.getElementById('spotify-tracks-container').innerHTML = `
+    <div class="loading-spinner"><div class="spinner"></div><div>読み込み中...</div></div>`;
+  document.getElementById('btn-do-import').disabled = true;
+  document.getElementById('import-count-label').textContent = '0件選択';
+  selectedTrackIds.clear();
+
+  try {
+    const headers = { Authorization: 'Bearer ' + token };
+
+    // 音楽（recently-played）とポッドキャスト（saved episodes）を並行取得
+    const [tracksRes, episodesRes] = await Promise.all([
+      fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', { headers }),
+      fetch('https://api.spotify.com/v1/me/episodes?limit=50&market=JP', { headers }),
+    ]);
+
+    if (tracksRes.status === 401) {
+      localStorage.removeItem(SP_TOKEN_KEY);
+      spotifyToken = null;
+      closeSpotifyImport();
+      alert('Spotifyのセッションが切れました。もう一度ログインしてください。');
+      onSpotifyBtn();
+      return;
+    }
+
+    const tracksJson   = await tracksRes.json();
+    const episodesJson = episodesRes.ok ? await episodesRes.json() : { items: [] };
+
+    const seen = new Set();
+
+    // 音楽：recently-played
+    const musicItems = (tracksJson.items || [])
+      .filter(item => {
+        const t = item.track;
+        if (!t || t.type === 'episode' || seen.has(t.id)) return false;
+        seen.add(t.id);
+        return true;
+      })
+      .map(item => {
+        const t = item.track;
+        return {
+          id: t.id, name: t.name, isEpisode: false,
+          artist:   t.artists.map(a => a.name).join(', '),
+          album:    t.album.name,
+          albumImg: t.album.images[2]?.url || t.album.images[0]?.url || '',
+          playedAt: item.played_at,
+        };
+      });
+
+    // ポッドキャスト：saved episodes（保存済みエピソード）
+    const podcastItems = (episodesJson.items || [])
+      .filter(item => {
+        const e = item.episode;
+        if (!e || seen.has(e.id)) return false;
+        seen.add(e.id);
+        return true;
+      })
+      .map(item => {
+        const e = item.episode;
+        return {
+          id: e.id, name: e.name, isEpisode: true,
+          artist:   e.show?.publisher || e.show?.name || '',
+          album:    e.show?.name || '',
+          albumImg: e.images?.[0]?.url || e.show?.images?.[0]?.url || '',
+          playedAt: item.added_at,
+        };
+      });
+
+    spotifyTracks = [...musicItems, ...podcastItems];
+    renderSpotifyTracks();
+  } catch(e) {
+    document.getElementById('spotify-tracks-container').innerHTML =
+      `<div class="empty"><div class="empty-icon">❌</div><h3>取得に失敗しました</h3><p>${e.message}</p></div>`;
+  }
+}
+
+// ---- トラックリスト表示 ----
+function renderSpotifyTracks() {
+  if (spotifyTracks.length === 0) {
+    document.getElementById('spotify-tracks-container').innerHTML =
+      `<div class="empty"><div class="empty-icon">🎵</div><h3>最近聴いた曲がありません</h3></div>`;
+    return;
+  }
+
+  // 既にMy Logに登録済みのSpotify IDセット
+  const existingIds = new Set(data.filter(d => d.spotifyId).map(d => d.spotifyId));
+
+  document.getElementById('spotify-tracks-container').innerHTML =
+    `<div class="spotify-track-list">` +
+    spotifyTracks.map(t => {
+      const already = existingIds.has(t.id);
+      const checked = selectedTrackIds.has(t.id);
+      return `
+        <div class="spotify-track-item ${checked ? 'selected' : ''}" id="track-${t.id}" onclick="${already ? '' : `toggleTrack('${t.id}')`}">
+          ${t.albumImg
+            ? `<img class="track-thumb" src="${escHtml(t.albumImg)}" alt="" loading="lazy">`
+            : `<div class="track-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">🎵</div>`
+          }
+          <div class="track-info">
+            <div class="track-name">${escHtml(t.name)}</div>
+            <div class="track-artist">${escHtml(t.artist)}</div>
+            <div class="track-album">${escHtml(t.album)}</div>
+          </div>
+          ${already
+            ? `<span class="already-badge">登録済み</span>`
+            : `<span class="track-check">${checked ? '✅' : '⬜️'}</span>`
+          }
+        </div>`;
+    }).join('') +
+    `</div>`;
+  updateImportCount();
+}
+
+function toggleTrack(id) {
+  if (selectedTrackIds.has(id)) selectedTrackIds.delete(id);
+  else selectedTrackIds.add(id);
+  // 該当アイテムだけ更新
+  const el = document.getElementById('track-' + id);
+  if (!el) return;
+  const checked = selectedTrackIds.has(id);
+  el.classList.toggle('selected', checked);
+  el.querySelector('.track-check').textContent = checked ? '✅' : '⬜️';
+  updateImportCount();
+}
+
+function toggleSelectAll() {
+  const existingIds = new Set(data.filter(d => d.spotifyId).map(d => d.spotifyId));
+  const available   = spotifyTracks.filter(t => !existingIds.has(t.id));
+  const allSelected = available.every(t => selectedTrackIds.has(t.id));
+  available.forEach(t => {
+    if (allSelected) selectedTrackIds.delete(t.id);
+    else             selectedTrackIds.add(t.id);
+  });
+  renderSpotifyTracks();
+}
+
+function updateImportCount() {
+  const n = selectedTrackIds.size;
+  document.getElementById('import-count-label').textContent = `${n}件選択`;
+  document.getElementById('btn-do-import').disabled = n === 0;
+}
+
+function closeSpotifyImport() {
+  document.getElementById('modal-spotify-import').classList.remove('open');
+}
+
+// ---- 選択した曲をインポート ----
+function importSelected() {
+  const today = new Date().toISOString().slice(0,10);
+  let count = 0;
+  spotifyTracks.forEach(t => {
+    if (!selectedTrackIds.has(t.id)) return;
+    const playedDate = t.playedAt ? t.playedAt.slice(0,10) : today;
+    data.push({
+      id: uid(), type: t.isEpisode ? 'podcast' : 'music',
+      title: t.name, date: playedDate,
+      rating: 3, memo: '',
+      artist: t.isEpisode ? '' : t.artist,
+      album:  t.isEpisode ? '' : t.album,
+      showName: t.isEpisode ? t.album : '',
+      author: '', status: '未読',
+      director: '', releaseYear: '', watchMethod: '配信',
+      spotifyId: t.id,
+    });
+    count++;
+  });
+  save(); renderList();
+  closeSpotifyImport();
+  showToast(`✅ ${count}曲をMy Logに追加しました！`);
+}
+
+// ---- 連携解除 ----
+function disconnectSpotify() {
+  if (!confirm('Spotify連携を解除しますか？\n（記録済みのデータは消えません）')) return;
+  localStorage.removeItem(SP_TOKEN_KEY);
+  localStorage.removeItem(SP_CLIENT_ID_KEY);
+  localStorage.removeItem(SP_VERIFIER_KEY);
+  spotifyToken = null;
+  closeSpotifySetup();
+  showToast('Spotify連携を解除しました');
+}
+
+// ===== TMDB 映画・ドラマ検索 =====
+const TMDB_KEY_STORAGE = 'mylog_tmdb_key';
+
+async function lookupTitle(prefix) {
+  const query = val(`${prefix}-search-title`);
+  if (!query) return;
+
+  let apiKey = localStorage.getItem(TMDB_KEY_STORAGE);
+  if (!apiKey) {
+    apiKey = prompt('TMDBのAPIキーを入力してください\n（themoviedb.org → Settings → API で無料取得）');
+    if (!apiKey) return;
+    localStorage.setItem(TMDB_KEY_STORAGE, apiKey.trim());
+  }
+
+  const status = document.getElementById(`${prefix}-search-status`);
+  status.style.display = 'block';
+  status.innerHTML = '<span style="color:#8e8e93;font-size:13px">🔍 検索中...</span>';
+
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}&language=ja-JP`
+    );
+    const json = await res.json();
+
+    if (json.status_code === 7) {
+      localStorage.removeItem(TMDB_KEY_STORAGE);
+      status.innerHTML = '<span style="color:#ff3b30;font-size:13px">❌ APIキーが無効です。もう一度検索して入力し直してください。</span>';
+      return;
+    }
+
+    const results = (json.results || [])
+      .filter(r => r.media_type === 'movie' || r.media_type === 'tv')
+      .slice(0, 6);
+
+    if (results.length === 0) {
+      status.innerHTML = '<span style="color:#ff3b30;font-size:13px">❌ 見つかりませんでした。別のキーワードで試してください。</span>';
+      return;
+    }
+
+    status.innerHTML = results.map(r => {
+      const title = escHtml(r.title || r.name || '');
+      const year  = (r.release_date || r.first_air_date || '').slice(0, 4);
+      const label = r.media_type === 'tv' ? 'TVドラマ' : '映画';
+      const color = r.media_type === 'tv' ? '#1db954' : '#007aff';
+      return `<div onclick="selectTitle('${prefix}','${r.id}','${r.media_type}')"
+        style="padding:9px 0;border-bottom:1px solid #f2f2f7;cursor:pointer;display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px;font-weight:500;flex:1">${title}</span>
+        <span style="font-size:11px;color:white;background:${color};padding:2px 7px;border-radius:10px;white-space:nowrap">${label}</span>
+        <span style="font-size:12px;color:#8e8e93;white-space:nowrap">${year}</span>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    status.innerHTML = '<span style="color:#ff3b30;font-size:13px">❌ 通信エラーが発生しました。</span>';
+  }
+}
+
+async function selectTitle(prefix, id, mediaType) {
+  const apiKey = localStorage.getItem(TMDB_KEY_STORAGE);
+  const status = document.getElementById(`${prefix}-search-status`);
+  status.innerHTML = '<span style="color:#8e8e93;font-size:13px">📡 詳細を取得中...</span>';
+
+  try {
+    const append = mediaType === 'movie' ? '&append_to_response=credits' : '';
+    const [detailRes, provRes] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${apiKey}&language=ja-JP${append}`),
+      fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/watch/providers?api_key=${apiKey}`)
+    ]);
+    const detail  = await detailRes.json();
+    const provJson = await provRes.json();
+
+    const title = detail.title || detail.name || '';
+    const year  = (detail.release_date || detail.first_air_date || '').slice(0, 4);
+
+    // 監督（映画）または制作（TVドラマ）
+    let director = '';
+    if (mediaType === 'movie') {
+      director = (detail.credits?.crew || []).find(c => c.job === 'Director')?.name || '';
+    } else {
+      director = (detail.created_by || []).map(c => c.name).join(', ');
+    }
+
+    // 日本の配信プラットフォーム
+    const jp = provJson.results?.JP;
+    const platforms = [...new Set([
+      ...(jp?.flatrate || []).map(p => p.provider_name),
+      ...(jp?.rent     || []).map(p => p.provider_name),
+    ])];
+
+    // フィールドに反映
+    const titleEl = document.getElementById(`${prefix}-title`);
+    if (titleEl) {
+      if (!titleEl.value) titleEl.value = title;
+      else if (confirm(`タイトルを「${title}」に上書きしますか？`)) titleEl.value = title;
+    }
+    if (director) setVal(`${prefix}-director`, director);
+    if (year)     setVal(`${prefix}-year`, year);
+    setVal(`${prefix}-platform`, platforms.join(' / '));
+    setVal(`${prefix}-subtype`, mediaType === 'tv' ? 'TVドラマ' : '映画');
+    if (platforms.length > 0) setVal(`${prefix}-watchmethod`, '配信');
+
+    const platformText = platforms.length > 0 ? `（${platforms.slice(0,3).join('・')}）` : '（配信情報なし）';
+    status.innerHTML = `<span style="color:#34c759;font-size:13px">✅ ${escHtml(title)} ${platformText}</span>`;
+    if (prefix === 'add') checkSaveAdd();
+
+  } catch(e) {
+    status.innerHTML = '<span style="color:#ff3b30;font-size:13px">❌ 詳細の取得に失敗しました。</span>';
+  }
+}
+
+// ===== ISBN検索 =====
+async function lookupISBN(prefix) {
+  const isbn = ('9784' + val(`${prefix}-isbn`)).replace(/-/g, '');
+  if (!isbn) return;
+
+  const status = document.getElementById(`${prefix}-isbn-status`);
+  status.style.display = 'block';
+  status.textContent = '🔍 検索中...';
+
+  try {
+    // openBD（日本の書籍データベース）で検索
+    const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${isbn}`);
+    const json = await res.json();
+    const book = json[0];
+
+    let title = '', authors = '', publisher = '', pubDate = '';
+
+    if (book && book.summary) {
+      // openBDで見つかった
+      const s = book.summary;
+      title     = s.title   || '';
+      authors   = s.author  || '';
+      publisher = s.publisher || '';
+      // pubdate は "20240101" 形式なので変換
+      if (s.pubdate && s.pubdate.length >= 6) {
+        const y = s.pubdate.slice(0,4);
+        const m = s.pubdate.slice(4,6);
+        const d = s.pubdate.length >= 8 ? s.pubdate.slice(6,8) : '01';
+        pubDate = `${y}-${m}-${d}`;
+      }
+    } else {
+      // フォールバック：Google Books APIで検索
+      const res2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+      const json2 = await res2.json();
+      if (!json2.totalItems) {
+        status.textContent = '❌ 見つかりませんでした。手動で入力してください。';
+        return;
+      }
+      const info = json2.items[0].volumeInfo;
+      title     = info.title || '';
+      authors   = (info.authors || []).join(', ');
+      publisher = info.publisher || '';
+      pubDate   = info.publishedDate || '';
+    }
+
+    // タイトルを反映
+    const titleEl = document.getElementById(`${prefix}-title`);
+    if (titleEl) {
+      if (!titleEl.value) {
+        titleEl.value = title;
+      } else if (confirm(`タイトルを「${title}」に上書きしますか？`)) {
+        titleEl.value = title;
+      }
+    }
+
+    setVal(`${prefix}-author`, authors);
+    setVal(`${prefix}-publisher`, publisher);
+    setVal(`${prefix}-publisheddate`, pubDate);
+
+    status.textContent = `✅ 取得しました：${title}`;
+    if (prefix === 'add') checkSaveAdd();
+
+  } catch(e) {
+    status.textContent = '❌ 通信エラーが発生しました。';
+  }
+}
+
+// ===== バーコードスキャナー =====
+let scannerReader = null;
+let scannerPrefix = '';
+
+async function openBarcodeScanner(prefix) {
+  scannerPrefix = prefix;
+  document.getElementById('modal-scanner').classList.add('open');
+  document.getElementById('scanner-status').textContent = 'カメラを起動中...';
+
+  const frame = document.querySelector('.scanner-frame');
+  if (frame && !frame.querySelector('.scanner-line')) {
+    frame.innerHTML = '<div class="scanner-line"></div><div class="sf-bl"></div><div class="sf-br"></div>';
+  }
+
+  try {
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8]);
+    scannerReader = new ZXing.BrowserMultiFormatReader(hints);
+
+    await scannerReader.decodeFromConstraints(
+      { video: { facingMode: 'environment' } },
+      'scanner-video',
+      (result, err) => {
+        if (!result) return;
+        const code = result.getText().replace(/[^0-9X]/g, '');
+        if (code.startsWith('978')) {
+          const suffix = code.startsWith('9784') ? code.slice(4) : code;
+          closeBarcodeScanner();
+          document.getElementById(`${prefix}-isbn`).value = suffix.slice(0, 9);
+          lookupISBN(prefix);
+        }
+      }
+    );
+    document.getElementById('scanner-status').textContent = '';
+  } catch(e) {
+    document.getElementById('scanner-status').textContent = 'カメラへのアクセスを許可してください';
+  }
+}
+
+function closeBarcodeScanner() {
+  if (scannerReader) { scannerReader.reset(); scannerReader = null; }
+  document.getElementById('modal-scanner').classList.remove('open');
+}
+
+// ===== 初期化 =====
+renderList();
+handleSpotifyCallback(); // OAuthリダイレクト後の処理
+</script>
+</body>
+</html>
