@@ -1035,15 +1035,28 @@
 
 <!-- ===== クイックスキャンモーダル ===== -->
 <div class="modal-overlay" id="modal-quickscan">
-  <div class="modal">
-    <div class="modal-header">
-      <button class="btn-cancel" onclick="closeQuickScan()">キャンセル</button>
-      <span class="modal-title">📚 本を追加</span>
-      <button id="qs-save-btn" class="btn-save" onclick="saveQuickScan()" disabled>保存</button>
-    </div>
-    <div style="padding:0 20px 32px;display:flex;flex-direction:column;gap:12px">
+  <div class="modal" style="display:flex;flex-direction:column;max-height:92vh">
 
-      <!-- スキャン / ISBN入力エリア -->
+    <!-- ヘッダー：スクロールに巻き込まれないよう flex-shrink:0 で固定 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                padding:18px 18px 14px;flex-shrink:0;
+                background:rgba(245,245,247,0.96);backdrop-filter:blur(20px);
+                -webkit-backdrop-filter:blur(20px);
+                border-radius:24px 24px 0 0;
+                border-bottom:1px solid rgba(0,0,0,0.07);
+                position:relative;z-index:10">
+      <button onclick="closeQuickScan()"
+        style="color:#0066cc;background:none;border:none;font-size:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;padding:4px 0">キャンセル</button>
+      <span style="font-size:17px;font-weight:700;letter-spacing:-0.2px">📚 本を追加</span>
+      <button id="qs-save-btn" onclick="saveQuickScan()" disabled
+        style="color:#0066cc;background:none;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;padding:4px 0;opacity:0.35">保存</button>
+    </div>
+
+    <!-- スクロール可能なコンテンツ -->
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;
+                padding:16px 20px 40px;display:flex;flex-direction:column;gap:12px">
+
+      <!-- スキャン / ISBN入力 -->
       <div id="qs-scan-area">
         <div style="display:flex;gap:8px;align-items:center;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
           <button onclick="openQSScanner()"
@@ -1060,7 +1073,7 @@
       </div>
 
       <!-- 取得結果プレビュー -->
-      <div id="qs-preview" style="display:none;background:white;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:none">
+      <div id="qs-preview" style="display:none;background:white;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
         <div style="display:flex;gap:12px;align-items:flex-start">
           <div id="qs-cover" style="width:52px;height:70px;background:#f5f5f7;border-radius:6px;flex-shrink:0;overflow:hidden"></div>
           <div style="flex:1;min-width:0">
@@ -1070,7 +1083,7 @@
         </div>
       </div>
 
-      <!-- タイトル（手動入力フォールバック） -->
+      <!-- タイトル（手動フォールバック） -->
       <div id="qs-title-area" style="display:none;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
         <div style="font-size:12px;color:#6e6e73;margin-bottom:6px;font-weight:600">タイトル</div>
         <input type="text" id="qs-title-input" placeholder="タイトルを入力"
@@ -1091,9 +1104,7 @@
       <!-- 評価 -->
       <div id="qs-rating-area" style="display:none;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
         <div style="font-size:12px;color:#6e6e73;margin-bottom:8px;font-weight:600">評価</div>
-        <div id="qs-stars" style="display:flex;gap:6px">
-          ${[1,2,3,4,5].map(n=>`<span onclick="setQSRating(${n})" style="font-size:28px;cursor:pointer">☆</span>`).join('')}
-        </div>
+        <div id="qs-stars" style="display:flex;gap:6px"></div>
       </div>
 
     </div>
@@ -2259,7 +2270,9 @@ function showQSPreview() {
   document.getElementById('qs-title-area').style.display = 'none';
   document.getElementById('qs-status-area').style.display = 'block';
   document.getElementById('qs-rating-area').style.display = 'block';
-  document.getElementById('qs-save-btn').disabled = !qsBook.title;
+  const saveBtn = document.getElementById('qs-save-btn');
+  saveBtn.disabled = !qsBook.title;
+  saveBtn.style.opacity = qsBook.title ? '1' : '0.35';
 }
 
 function showQSManual() {
@@ -2271,7 +2284,10 @@ function showQSManual() {
 
 function checkQSSave() {
   const manual = document.getElementById('qs-title-input').value.trim();
-  document.getElementById('qs-save-btn').disabled = !manual && !qsBook.title;
+  const ok = !!(manual || qsBook.title);
+  const btn = document.getElementById('qs-save-btn');
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '1' : '0.35';
 }
 
 function setQSStatus(btn) {
