@@ -2125,7 +2125,6 @@ function openQuickScan() {
 }
 
 // ===== 書籍検索（楽天ブックスAPI） =====
-const RAKUTEN_APP_ID_KEY = 'mylog_rakuten_app_id';
 let bookSearchData = {};
 
 async function searchBook(prefix) {
@@ -2133,66 +2132,32 @@ async function searchBook(prefix) {
   if (!q) return;
   const resultsEl = document.getElementById(`${prefix}-book-results`);
 
-  // Application ID の確認・取得
-  let appId = localStorage.getItem(RAKUTEN_APP_ID_KEY);
-  if (!appId) {
-    resultsEl.innerHTML = `
-      <div style="background:#282828;border-radius:14px;padding:18px 16px;margin-top:4px">
-        <div style="font-size:14px;font-weight:600;color:#FFFFFF;margin-bottom:8px">📚 楽天ブックスAPI設定</div>
-        <div style="font-size:12px;color:#B3B3B3;line-height:1.7;margin-bottom:12px">
-          書名検索には楽天ブックスの無料APIキーが必要です。<br>
-          ① <a href="https://webservice.rakuten.co.jp/" target="_blank" style="color:#1db954">webservice.rakuten.co.jp</a> で登録<br>
-          ② アプリ登録 → Application IDをコピー
-        </div>
-        <div style="display:flex;gap:8px">
-          <input id="${prefix}-rakuten-id-input" type="text" placeholder="Application ID を入力"
-            style="flex:1;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;font-size:14px;color:#FFFFFF;outline:none;font-family:monospace">
-          <button onclick="saveRakutenId('${prefix}')"
-            style="background:#1db954;color:white;border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">
-            保存
-          </button>
-        </div>
-      </div>`;
-    return;
-  }
-
   resultsEl.innerHTML = `<div style="padding:14px 0;text-align:center;color:#B3B3B3;font-size:14px">検索中...</div>`;
 
   try {
+    // OpenBD（国内書籍DB、APIキー不要・CORS対応）
     const res = await fetch(
-      `https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?applicationId=${encodeURIComponent(appId)}&title=${encodeURIComponent(q)}&hits=10&format=json&formatVersion=2`
+      `https://api.openbd.jp/v1/search?title=${encodeURIComponent(q)}&limit=15`
     );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
-    if (json.error) {
-      const storedId = localStorage.getItem(RAKUTEN_APP_ID_KEY) || '';
-      const preview  = storedId.length > 8
-        ? storedId.slice(0,4) + '…' + storedId.slice(-4) + ` (${storedId.length}文字)`
-        : `"${storedId}" (${storedId.length}文字)`;
-      resultsEl.innerHTML = `
-        <div style="background:#282828;border-radius:14px;padding:16px;margin-top:4px">
-          <div style="color:#ff4444;font-size:13px;margin-bottom:10px">❌ ${escHtml(json.error_description||json.error)}</div>
-          <div style="color:#B3B3B3;font-size:12px;margin-bottom:12px">保存中のID: <code style="color:#FFFFFF;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">${escHtml(preview)}</code></div>
-          <div style="font-size:12px;color:#B3B3B3;margin-bottom:10px">楽天デベロッパーの画面で<br><strong style="color:#FFFFFF">「Application ID」</strong>（数字の長い文字列）をコピーしてください</div>
-          <div style="display:flex;gap:8px">
-            <input id="${prefix}-rakuten-id-input" type="text" placeholder="Application ID を貼り付け"
-              style="flex:1;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;font-size:14px;color:#FFFFFF;outline:none;font-family:monospace">
-            <button onclick="saveRakutenId('${prefix}')"
-              style="background:#1db954;color:white;border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">保存</button>
-          </div>
-        </div>`;
-      return;
-    }
-
-    const items = (json.Items || []).map(i => {
-      return {
-        title:     i.title     || '',
-        author:    i.author    || '',
-        publisher: i.publisherName || '',
-        date:      (i.salesDate || '').slice(0, 10),
-        thumb:     i.largeImageUrl || i.mediumImageUrl || ''
-      };
-    }).filter(b => b.title);
+    const items = (Array.isArray(json) ? json : [])
+      .filter(b => b && b.summary && b.summary.title)
+      .map(b => {
+        const s = b.summary;
+        // pubdate は "20030901" 形式 → "2003-09-01" に変換
+        let date = s.pubdate || '';
+        if (date.length === 8) date = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
+        else if (date.length === 6) date = `${date.slice(0,4)}-${date.slice(4,6)}`;
+        return {
+          title:     s.title     || '',
+          author:    s.author    || '',
+          publisher: s.publisher || '',
+          date,
+          thumb:     s.cover || (s.isbn ? `https://cover.openbd.jp/${s.isbn}.jpg` : '')
+        };
+      });
 
     if (!items.length) {
       resultsEl.innerHTML = `<div style="padding:12px 0;color:#B3B3B3;font-size:13px;text-align:center">見つかりませんでした</div>`;
@@ -2217,14 +2182,6 @@ async function searchBook(prefix) {
   } catch(e) {
     resultsEl.innerHTML = `<div style="padding:12px 0;color:#ff4444;font-size:13px;text-align:center">❌ 通信エラーが発生しました</div>`;
   }
-}
-
-function saveRakutenId(prefix) {
-  const input = document.getElementById(`${prefix}-rakuten-id-input`);
-  const val = input ? input.value.trim() : '';
-  if (!val) return;
-  localStorage.setItem(RAKUTEN_APP_ID_KEY, val);
-  searchBook(prefix); // 保存後すぐに検索実行
 }
 
 function selectBook(prefix, index) {
