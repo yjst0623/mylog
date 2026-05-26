@@ -2165,12 +2165,7 @@ async function searchBook(prefix) {
     const json = await res.json();
 
     if (json.error) {
-      if (json.error === 'wrong_parameter') {
-        localStorage.removeItem(RAKUTEN_APP_ID_KEY);
-        resultsEl.innerHTML = `<div style="padding:12px 0;color:#ff4444;font-size:13px;text-align:center">❌ Application IDが無効です。もう一度設定してください。</div>`;
-      } else {
-        resultsEl.innerHTML = `<div style="padding:12px 0;color:#ff4444;font-size:13px;text-align:center">❌ エラー: ${json.error_description || json.error}</div>`;
-      }
+      resultsEl.innerHTML = `<div style="padding:12px 0;color:#ff4444;font-size:12px;text-align:center">❌ エラー: ${escHtml(json.error)}<br>${escHtml(json.error_description||'')}<br><button onclick="localStorage.removeItem('${RAKUTEN_APP_ID_KEY}');document.getElementById('${prefix}-book-results').innerHTML=''" style="margin-top:8px;background:rgba(255,255,255,0.1);color:#B3B3B3;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer">Application IDを再設定</button></div>`;
       return;
     }
 
