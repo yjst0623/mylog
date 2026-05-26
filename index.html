@@ -2265,84 +2265,80 @@ function showBackupStatus(msg, isError = false) {
   el.style.display = 'block';
 }
 
-// ===== バーコードスキャナー =====
-// ライブ映像スキャンをやめ「写真を撮って読み取る」方式に変更
-// → ZXingがDOMを汚染してタッチを横取りする問題を根本解消
-function openBarcodeScanner(prefix) {
-  const input = document.createElement('input');
-  input.type    = 'file';
-  input.accept  = 'image/*';
-  input.capture = 'environment'; // iOSはリアカメラで直接起動
+// ===== バーコードスキャナー（ライブカメラ方式）=====
+let _zxingReader = null;
+let _scannerPrefix = null;
 
-  input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+async function openBarcodeScanner(prefix) {
+  _scannerPrefix = prefix;
+  const overlay = document.getElementById('modal-scanner');
+  const status  = document.getElementById('scanner-status');
 
-    // ステータス表示
-    const statusEl = prefix === 'qs'
-      ? document.getElementById('qs-isbn-status')
-      : document.getElementById(`${prefix}-isbn-status`);
-    if (statusEl) { statusEl.textContent = '読み取り中...'; statusEl.style.display = 'block'; }
+  // videoを確実にクリーンな状態にするため差し替え
+  const oldVideo = document.getElementById('scanner-video');
+  const newVideo = document.createElement('video');
+  newVideo.id = 'scanner-video';
+  newVideo.setAttribute('playsinline', '');
+  newVideo.setAttribute('autoplay', '');
+  newVideo.setAttribute('muted', '');
+  newVideo.style.cssText = 'width:100%;display:block;max-height:70vh;object-fit:cover';
+  oldVideo.parentNode.replaceChild(newVideo, oldVideo);
 
-    const url = URL.createObjectURL(file);
-    try {
-      let code = null;
+  overlay.classList.add('open');
+  status.textContent = 'カメラを起動中...';
 
-      // ① BarcodeDetector（iOS17以降）で試みる
-      if ('BarcodeDetector' in window) {
-        try {
-          const img = new Image();
-          img.src = url;
-          await new Promise(r => { img.onload = r; img.onerror = r; });
-          const det = new BarcodeDetector({ formats: ['ean_13','ean_8'] });
-          const results = await det.detect(img);
-          if (results.length) code = results[0].rawValue;
-        } catch(_) {}
-      }
+  try {
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,
+      [ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8]);
+    _zxingReader = new ZXing.BrowserMultiFormatReader(hints);
 
-      // ② ZXing静止画デコードで試みる
-      if (!code) {
-        const hints = new Map();
-        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,
-          [ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8]);
-        const reader = new ZXing.BrowserMultiFormatReader(hints);
-        const img = new Image();
-        img.src = url;
-        await new Promise(r => { img.onload = r; img.onerror = r; });
-        try {
-          const res = await reader.decodeFromImageElement(img);
-          code = res.getText();
-        } catch(_) {}
-      }
-
-      if (code) {
-        code = code.replace(/[^0-9X]/g, '');
-        if (code.startsWith('978')) {
-          const suffix = code.startsWith('9784') ? code.slice(4) : code;
-          if (statusEl) statusEl.style.display = 'none';
-          if (prefix === 'qs') {
-            document.getElementById('qs-isbn').value = suffix.slice(0, 9);
-            lookupQS();
-          } else {
-            document.getElementById(`${prefix}-isbn`).value = suffix.slice(0, 9);
-            lookupISBN(prefix);
+    await _zxingReader.decodeFromConstraints(
+      { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+      newVideo,
+      (result, err) => {
+        if (result) {
+          const code = result.getText().replace(/[^0-9X]/g, '');
+          if (code.startsWith('978')) {
+            const pfx = _scannerPrefix;
+            closeBarcodeScanner();
+            const suffix = code.startsWith('9784') ? code.slice(4) : code;
+            const isbnEl = document.getElementById(`${pfx}-isbn`);
+            if (isbnEl) { isbnEl.value = suffix.slice(0, 9); lookupISBN(pfx); }
           }
-        } else {
-          if (statusEl) statusEl.textContent = '書籍のバーコードが見つかりませんでした。もう一度試してください。';
         }
-      } else {
-        if (statusEl) statusEl.textContent = 'バーコードを読み取れませんでした。明るい場所で再試行してください。';
       }
-    } catch(err) {
-      if (statusEl) statusEl.textContent = '読み取りに失敗しました。もう一度試してください。';
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  };
-  input.click();
+    );
+    status.textContent = 'バーコードを枠内に合わせてください';
+  } catch(err) {
+    status.textContent = 'カメラの起動に失敗しました。';
+    console.error('scanner error:', err);
+  }
 }
 
-function closeBarcodeScanner() {} // 互換性のため残す
+function closeBarcodeScanner() {
+  const overlay = document.getElementById('modal-scanner');
+  const video   = document.getElementById('scanner-video');
+
+  // 1. ZXingリセット（内部タイマー・ストリーム停止）
+  if (_zxingReader) {
+    try { _zxingReader.reset(); } catch(_) {}
+    _zxingReader = null;
+  }
+
+  // 2. カメラトラックを明示的に停止 → srcObjectをクリア
+  if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+
+  // 3. ZXingがbodyに追加したcanvas要素を除去（タッチ横取り防止）
+  document.querySelectorAll('body > canvas').forEach(c => c.remove());
+
+  // 4. モーダルを閉じる
+  overlay.classList.remove('open');
+  _scannerPrefix = null;
+}
 
 // ===== 初期化 =====
 renderList();
