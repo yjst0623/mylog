@@ -2160,12 +2160,27 @@ async function searchBook(prefix) {
 
   try {
     const res = await fetch(
-      `https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?applicationId=${appId}&title=${encodeURIComponent(q)}&hits=10&format=json&formatVersion=2`
+      `https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?applicationId=${encodeURIComponent(appId)}&title=${encodeURIComponent(q)}&hits=10&format=json&formatVersion=2`
     );
     const json = await res.json();
 
     if (json.error) {
-      resultsEl.innerHTML = `<div style="padding:12px 0;color:#ff4444;font-size:12px;text-align:center">❌ エラー: ${escHtml(json.error)}<br>${escHtml(json.error_description||'')}<br><button onclick="localStorage.removeItem('${RAKUTEN_APP_ID_KEY}');document.getElementById('${prefix}-book-results').innerHTML=''" style="margin-top:8px;background:rgba(255,255,255,0.1);color:#B3B3B3;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer">Application IDを再設定</button></div>`;
+      const storedId = localStorage.getItem(RAKUTEN_APP_ID_KEY) || '';
+      const preview  = storedId.length > 8
+        ? storedId.slice(0,4) + '…' + storedId.slice(-4) + ` (${storedId.length}文字)`
+        : `"${storedId}" (${storedId.length}文字)`;
+      resultsEl.innerHTML = `
+        <div style="background:#282828;border-radius:14px;padding:16px;margin-top:4px">
+          <div style="color:#ff4444;font-size:13px;margin-bottom:10px">❌ ${escHtml(json.error_description||json.error)}</div>
+          <div style="color:#B3B3B3;font-size:12px;margin-bottom:12px">保存中のID: <code style="color:#FFFFFF;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">${escHtml(preview)}</code></div>
+          <div style="font-size:12px;color:#B3B3B3;margin-bottom:10px">楽天デベロッパーの画面で<br><strong style="color:#FFFFFF">「Application ID」</strong>（数字の長い文字列）をコピーしてください</div>
+          <div style="display:flex;gap:8px">
+            <input id="${prefix}-rakuten-id-input" type="text" placeholder="Application ID を貼り付け"
+              style="flex:1;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;font-size:14px;color:#FFFFFF;outline:none;font-family:monospace">
+            <button onclick="saveRakutenId('${prefix}')"
+              style="background:#1db954;color:white;border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">保存</button>
+          </div>
+        </div>`;
       return;
     }
 
