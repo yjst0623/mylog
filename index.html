@@ -1237,7 +1237,10 @@ function renderListItem(item, groupBy) {
   }
   return `
     <div class="list-item" onclick="openDetail('${item.id}')">
-      <div class="type-icon ${item.type}">${TYPE_ICON[item.type]}</div>
+      ${item.type === 'book' && item.coverUrl
+        ? `<img src="${escHtml(item.coverUrl)}" style="width:48px;height:68px;border-radius:6px;object-fit:cover;flex-shrink:0" onerror="this.outerHTML='<div class=\'type-icon book\'>📚</div>'">`
+        : `<div class="type-icon ${item.type}">${TYPE_ICON[item.type]}</div>`
+      }
       <div class="item-info">
         <div class="item-title">${escHtml(item.title)}</div>
         ${sub ? `<div class="item-sub">${escHtml(sub)}</div>` : ''}
@@ -1350,7 +1353,10 @@ function renderDetail() {
   document.getElementById('detail-container').innerHTML = `
     <button class="btn-back" onclick="backToList()">‹ 戻る</button>
     <div class="detail-header">
-      <div class="detail-icon ${item.type}">${TYPE_ICON[item.type]}</div>
+      ${item.type === 'book' && item.coverUrl
+        ? `<img src="${escHtml(item.coverUrl)}" style="width:72px;height:100px;border-radius:10px;object-fit:cover;flex-shrink:0" onerror="this.outerHTML='<div class=\'detail-icon book\'>📚</div>'">`
+        : `<div class="detail-icon ${item.type}">${TYPE_ICON[item.type]}</div>`
+      }
       <div>
         <div class="detail-type">${TYPE_NAME[item.type]}</div>
         <div class="detail-title">${escHtml(item.title)}</div>
@@ -1518,9 +1524,10 @@ function saveAdd() {
     artist:'', album:'', author:'', status:'未読', director:'', releaseYear:'', watchMethod:'配信'
   };
   if (addType === 'music') { item.artist = val('add-artist'); item.album = val('add-album'); }
-  else if (addType === 'book') { item.author = val('add-author'); item.status = val('add-status') || '未読'; item.publisher = val('add-publisher'); item.publishedDate = val('add-publisheddate'); }
+  else if (addType === 'book') { item.author = val('add-author'); item.status = val('add-status') || '未読'; item.publisher = val('add-publisher'); item.publishedDate = val('add-publisheddate'); item.coverUrl = _bookCover['add'] || ''; }
   else if (addType === 'movie') { item.director = val('add-director'); item.releaseYear = val('add-year'); item.watchMethod = val('add-watchmethod') || '配信'; item.subtype = val('add-subtype') || '映画'; item.platform = val('add-platform'); }
   else if (addType === 'podcast') { item.showName = val('add-showname'); }
+  _bookCover['add'] = '';
   data.push(item); save(); renderList(); closeAdd();
 }
 
@@ -1535,7 +1542,7 @@ function openEdit(id) {
   document.getElementById('edit-memo').value = item.memo || '';
   renderEditRating(); renderTypeFields('edit', item.type);
   if (item.type === 'music') { setVal('edit-artist', item.artist); setVal('edit-album', item.album); }
-  else if (item.type === 'book') { setVal('edit-author', item.author); setVal('edit-status', item.status); setVal('edit-publisher', item.publisher); setVal('edit-publisheddate', item.publishedDate); }
+  else if (item.type === 'book') { setVal('edit-author', item.author); setVal('edit-status', item.status); setVal('edit-publisher', item.publisher); setVal('edit-publisheddate', item.publishedDate); _bookCover['edit'] = item.coverUrl || ''; }
   else if (item.type === 'movie') { setVal('edit-director', item.director); setVal('edit-year', item.releaseYear); setVal('edit-watchmethod', item.watchMethod); setVal('edit-subtype', item.subtype || '映画'); setVal('edit-platform', item.platform); }
   else if (item.type === 'podcast') { setVal('edit-showname', item.showName); }
   document.getElementById('modal-edit').classList.add('open');
@@ -1552,7 +1559,7 @@ function saveEdit() {
   item.rating = editRating;
   item.memo = document.getElementById('edit-memo').value.trim();
   if (item.type === 'music') { item.artist = val('edit-artist'); item.album = val('edit-album'); }
-  else if (item.type === 'book') { item.author = val('edit-author'); item.status = val('edit-status'); item.publisher = val('edit-publisher'); item.publishedDate = val('edit-publisheddate'); }
+  else if (item.type === 'book') { item.author = val('edit-author'); item.status = val('edit-status'); item.publisher = val('edit-publisher'); item.publishedDate = val('edit-publisheddate'); item.coverUrl = _bookCover['edit'] || item.coverUrl || ''; }
   else if (item.type === 'movie') { item.director = val('edit-director'); item.releaseYear = val('edit-year'); item.watchMethod = val('edit-watchmethod'); item.subtype = val('edit-subtype') || '映画'; item.platform = val('edit-platform'); }
   else if (item.type === 'podcast') { item.showName = val('edit-showname'); }
   save(); renderDetail(); closeEdit();
@@ -2067,12 +2074,14 @@ async function lookupISBN(prefix) {
 
     let title = '', authors = '', publisher = '', pubDate = '';
 
+    let coverUrl = '';
     if (book && book.summary) {
       // openBDで見つかった
       const s = book.summary;
       title     = s.title   || '';
       authors   = s.author  || '';
       publisher = s.publisher || '';
+      coverUrl  = s.cover || (s.isbn ? `https://cover.openbd.jp/${s.isbn}.jpg` : '');
       // pubdate は "20240101" 形式なので変換
       if (s.pubdate && s.pubdate.length >= 6) {
         const y = s.pubdate.slice(0,4);
@@ -2081,19 +2090,12 @@ async function lookupISBN(prefix) {
         pubDate = `${y}-${m}-${d}`;
       }
     } else {
-      // フォールバック：Google Books APIで検索
-      const res2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-      const json2 = await res2.json();
-      if (!json2.totalItems) {
-        status.textContent = '❌ 見つかりませんでした。手動で入力してください。';
-        return;
-      }
-      const info = json2.items[0].volumeInfo;
-      title     = info.title || '';
-      authors   = (info.authors || []).join(', ');
-      publisher = info.publisher || '';
-      pubDate   = info.publishedDate || '';
+      status.textContent = '❌ 見つかりませんでした。手動で入力してください。';
+      return;
     }
+
+    // カバーURLを保存
+    _bookCover[prefix] = coverUrl;
 
     // タイトルを反映
     const titleEl = document.getElementById(`${prefix}-title`);
@@ -2103,7 +2105,14 @@ async function lookupISBN(prefix) {
     setVal(`${prefix}-publisher`, publisher);
     setVal(`${prefix}-publisheddate`, pubDate);
 
-    status.textContent = `✅ 取得しました：${title}`;
+    // ステータス表示（カバーサムネイル付き）
+    status.style.display = 'block';
+    status.innerHTML = coverUrl
+      ? `<div style="display:flex;align-items:center;gap:10px;padding:4px 0">
+           <img src="${escHtml(coverUrl)}" style="width:36px;height:50px;border-radius:4px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">
+           <span style="color:#1db954;font-size:13px">✅ ${escHtml(title)}</span>
+         </div>`
+      : `<span style="color:#1db954;font-size:13px">✅ ${escHtml(title)}</span>`;
     if (prefix === 'add') checkSaveAdd();
 
   } catch(e) {
@@ -2123,6 +2132,7 @@ function openQuickScan() {
 
 // ===== 書籍検索（楽天ブックスAPI） =====
 let bookSearchData = {};
+let _bookCover = {}; // prefix -> coverUrl
 
 async function searchBook(prefix) {
   const q = document.getElementById(`${prefix}-book-q`).value.trim();
