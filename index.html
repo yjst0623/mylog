@@ -2160,7 +2160,7 @@ async function searchBook(prefix) {
 
   try {
     const res = await fetch(
-      `https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?applicationId=${appId}&title=${encodeURIComponent(q)}&hits=10&format=json&language=JA`
+      `https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?applicationId=${appId}&title=${encodeURIComponent(q)}&hits=10&format=json&formatVersion=2`
     );
     const json = await res.json();
 
@@ -2174,13 +2174,12 @@ async function searchBook(prefix) {
       return;
     }
 
-    const items = (json.Items || []).map(entry => {
-      const i = entry.Item || entry;
+    const items = (json.Items || []).map(i => {
       return {
         title:     i.title     || '',
         author:    i.author    || '',
         publisher: i.publisherName || '',
-        date:      (i.salesDate  || '').replace(/年(\d)月/, '年0$1月').replace(/月(\d)日/, '月0$1日').replace(/年|月|日/g, m => m === '年' ? '-' : m === '月' ? '-' : '').replace(/-$/, ''),
+        date:      (i.salesDate || '').slice(0, 10),
         thumb:     i.largeImageUrl || i.mediumImageUrl || ''
       };
     }).filter(b => b.title);
