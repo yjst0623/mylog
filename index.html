@@ -1423,20 +1423,20 @@ function renderTypeFields(prefix, type) {
     </div>`;
   } else if (type === 'book') {
     container.innerHTML = `
-      <div class="section-label">書名で検索</div>
+      <div class="section-label">ISBNで検索</div>
       <div class="form-card">
         <div class="form-row" style="gap:8px">
-          <input type="text" id="${prefix}-book-q"
-            placeholder="書名を入力（例：坊っちゃん）"
+          <input type="text" id="${prefix}-isbn" inputmode="numeric"
+            placeholder="ISBNを入力（13桁または下9桁）"
             style="flex:1;border:none;outline:none;font-size:16px;background:transparent;color:#FFFFFF"
-            onkeydown="if(event.key==='Enter')searchBook('${prefix}')">
-          <button onclick="searchBook('${prefix}')"
+            onkeydown="if(event.key==='Enter')lookupISBN('${prefix}')">
+          <button onclick="lookupISBN('${prefix}')"
             style="background:#1db954;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0">
             検索
           </button>
         </div>
+        <div id="${prefix}-isbn-status" style="padding:4px 0 6px;font-size:13px;color:#B3B3B3;display:none"></div>
       </div>
-      <div id="${prefix}-book-results" style="margin-top:4px"></div>
       <div class="section-label" style="margin-top:8px">本の情報</div>
       <div class="form-card">
         <div class="form-row"><label class="form-label">著者</label><input type="text" id="${prefix}-author" placeholder="任意"></div>
@@ -2049,8 +2049,11 @@ async function selectTitle(prefix, id, mediaType) {
 
 // ===== ISBN検索 =====
 async function lookupISBN(prefix) {
-  const isbn = ('9784' + val(`${prefix}-isbn`)).replace(/-/g, '');
-  if (!isbn) return;
+  const raw = val(`${prefix}-isbn`).replace(/[-\s]/g, '');
+  if (!raw) return;
+  // 13桁で978始まりならそのまま、それ以外は9784を付けて補完
+  const isbn = (raw.length === 13 && raw.startsWith('978')) ? raw : '9784' + raw;
+  if (isbn.length < 10) return;
 
   const status = document.getElementById(`${prefix}-isbn-status`);
   status.style.display = 'block';
@@ -2094,13 +2097,7 @@ async function lookupISBN(prefix) {
 
     // タイトルを反映
     const titleEl = document.getElementById(`${prefix}-title`);
-    if (titleEl) {
-      if (!titleEl.value) {
-        titleEl.value = title;
-      } else if (confirm(`タイトルを「${title}」に上書きしますか？`)) {
-        titleEl.value = title;
-      }
-    }
+    if (titleEl) titleEl.value = title;
 
     setVal(`${prefix}-author`, authors);
     setVal(`${prefix}-publisher`, publisher);
