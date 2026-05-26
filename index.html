@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="My Log">
 <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
 <style>
@@ -15,8 +15,8 @@
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    background: #f5f5f7;
-    color: #1d1d1f;
+    background: #121212;
+    color: #FFFFFF;
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
@@ -27,10 +27,10 @@
 
   /* ===== HEADER ===== */
   .header {
-    background: rgba(245,245,247,0.85);
+    background: rgba(18,18,18,0.92);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     padding: 16px 20px 0;
     position: sticky;
     top: 0;
@@ -46,7 +46,7 @@
     font-size: 34px;
     font-weight: 700;
     letter-spacing: -0.5px;
-    color: #1d1d1f;
+    color: #FFFFFF;
   }
   .header-actions { display: flex; gap: 10px; align-items: center; }
   .btn-spotify {
@@ -66,7 +66,7 @@
   }
   .btn-spotify:active { opacity: 0.75; }
   .btn-add {
-    background: #0066cc;
+    background: #1db954;
     border: none;
     font-size: 20px;
     color: white;
@@ -89,23 +89,23 @@
   .search-bar input {
     width: 100%;
     padding: 9px 14px 9px 36px;
-    background: rgba(118,118,128,0.12);
+    background: rgba(255,255,255,0.1);
     border: none;
     border-radius: 12px;
     font-size: 15px;
     outline: none;
-    color: #1d1d1f;
+    color: #FFFFFF;
     font-family: inherit;
     transition: background 0.15s;
   }
-  .search-bar input:focus { background: rgba(118,118,128,0.16); }
-  .search-bar input::placeholder { color: #6e6e73; }
+  .search-bar input:focus { background: rgba(255,255,255,0.15); }
+  .search-bar input::placeholder { color: #B3B3B3; }
   .search-icon {
     position: absolute;
     left: 11px;
     top: 50%;
     transform: translateY(-50%);
-    color: #6e6e73;
+    color: #B3B3B3;
     font-size: 14px;
   }
   .filter-bar {
@@ -120,18 +120,18 @@
     white-space: nowrap;
     padding: 6px 14px;
     border-radius: 20px;
-    border: 1.5px solid rgba(0,0,0,0.15);
+    border: 1.5px solid rgba(255,255,255,0.2);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     background: transparent;
-    color: #1d1d1f;
+    color: #FFFFFF;
     transition: all 0.18s;
     letter-spacing: -0.1px;
   }
   .chip.active {
-    background: #1d1d1f;
-    border-color: #1d1d1f;
+    background: #1db954;
+    border-color: #1db954;
     color: white;
   }
 
@@ -143,10 +143,10 @@
     transform: translateX(-50%);
     width: 100%;
     max-width: 430px;
-    background: rgba(245,245,247,0.88);
+    background: rgba(18,18,18,0.96);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(255,255,255,0.1);
     display: flex;
     z-index: 100;
   }
@@ -157,7 +157,7 @@
     align-items: center;
     padding: 10px 0 14px;
     cursor: pointer;
-    color: #6e6e73;
+    color: #B3B3B3;
     font-size: 10px;
     font-weight: 500;
     gap: 3px;
@@ -166,7 +166,7 @@
     letter-spacing: 0.1px;
     transition: color 0.15s;
   }
-  .tab-item.active { color: #0066cc; }
+  .tab-item.active { color: #1db954; }
   .tab-icon { font-size: 22px; }
 
   /* ===== SCREEN ===== */
@@ -175,25 +175,25 @@
 
   /* ===== LIST ===== */
   .list {
-    background: white;
+    background: #1E1E1E;
     margin: 16px 0;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   }
   .list-item {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     cursor: pointer;
     transition: background 0.12s;
     text-decoration: none;
     color: inherit;
   }
   .list-item:last-child { border-bottom: none; }
-  .list-item:active { background: #f5f5f7; }
+  .list-item:active { background: #282828; }
   .type-icon {
     width: 48px;
     height: 48px;
@@ -216,11 +216,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     letter-spacing: -0.2px;
-    color: #1d1d1f;
+    color: #FFFFFF;
   }
   .item-sub {
     font-size: 13px;
-    color: #6e6e73;
+    color: #B3B3B3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -229,8 +229,8 @@
   .item-meta { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
   .stars { display: flex; gap: 1px; }
   .star { font-size: 10px; }
-  .item-date { font-size: 11px; color: #aeaeb2; }
-  .chevron { color: #c7c7cc; font-size: 16px; font-weight: 300; }
+  .item-date { font-size: 11px; color: #B3B3B3; }
+  .chevron { color: #535353; font-size: 16px; font-weight: 300; }
 
   /* ===== EMPTY ===== */
   .empty {
@@ -240,15 +240,15 @@
     justify-content: center;
     padding: 80px 24px;
     gap: 14px;
-    color: #6e6e73;
+    color: #B3B3B3;
   }
   .empty-icon { font-size: 64px; opacity: 0.6; }
-  .empty h3 { font-size: 20px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.3px; }
+  .empty h3 { font-size: 20px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.3px; }
   .empty p { font-size: 15px; text-align: center; line-height: 1.5; }
   .btn-primary {
     margin-top: 6px;
     padding: 12px 28px;
-    background: #0066cc;
+    background: #1db954;
     color: white;
     border: none;
     border-radius: 24px;
@@ -271,7 +271,7 @@
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: #f5f5f7;
+    background: #121212;
     border-radius: 24px 24px 0 0;
     width: 100%;
     max-width: 430px;
@@ -289,58 +289,58 @@
     justify-content: space-between;
     align-items: center;
     padding: 18px 18px 14px;
-    background: rgba(245,245,247,0.92);
+    background: rgba(18,18,18,0.96);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 10;
     border-radius: 24px 24px 0 0;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
-  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
-  .btn-cancel { color: #0066cc; background: none; border: none; font-size: 16px; cursor: pointer; font-family: inherit; }
-  .btn-save { color: #0066cc; background: none; border: none; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
-  .btn-save:disabled { color: #aeaeb2; }
+  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; color: #FFFFFF; }
+  .btn-cancel { color: #1db954; background: none; border: none; font-size: 16px; cursor: pointer; font-family: inherit; }
+  .btn-save { color: #1db954; background: none; border: none; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-save:disabled { color: #535353; }
 
   /* ===== FORM ===== */
   .form-section { margin: 14px 16px; }
   .section-label {
     font-size: 12px;
     font-weight: 600;
-    color: #6e6e73;
+    color: #B3B3B3;
     text-transform: uppercase;
     letter-spacing: 0.6px;
     padding: 0 4px;
     margin-bottom: 8px;
   }
   .form-card {
-    background: white;
+    background: #282828;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.3);
   }
   .form-row {
     display: flex;
     align-items: center;
     padding: 13px 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     gap: 12px;
   }
   .form-row:last-child { border-bottom: none; }
-  .form-label { font-size: 16px; color: #1d1d1f; min-width: 70px; flex-shrink: 0; font-weight: 400; }
+  .form-label { font-size: 16px; color: #FFFFFF; min-width: 70px; flex-shrink: 0; font-weight: 400; }
   .form-row input, .form-row select {
     flex: 1;
     border: none;
     outline: none;
     font-size: 16px;
     text-align: right;
-    color: #1d1d1f;
+    color: #FFFFFF;
     background: transparent;
     font-family: inherit;
   }
-  .form-row input::placeholder { color: #c7c7cc; }
-  .form-row select { cursor: pointer; color: #6e6e73; }
+  .form-row input::placeholder { color: #535353; }
+  .form-row select { cursor: pointer; color: #B3B3B3; }
   textarea {
     width: 100%;
     padding: 14px 16px;
@@ -349,19 +349,19 @@
     font-size: 16px;
     font-family: inherit;
     resize: none;
-    background: white;
-    color: #1d1d1f;
+    background: #282828;
+    color: #FFFFFF;
     min-height: 90px;
     border-radius: 16px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.3);
   }
-  textarea::placeholder { color: #c7c7cc; }
+  textarea::placeholder { color: #535353; }
 
   /* タイプセレクター */
   .type-selector {
     display: flex;
     gap: 0;
-    background: rgba(118,118,128,0.12);
+    background: rgba(255,255,255,0.1);
     border-radius: 12px;
     padding: 3px;
     margin: 14px 16px;
@@ -375,13 +375,14 @@
     font-weight: 500;
     cursor: pointer;
     background: transparent;
-    color: #1d1d1f;
+    color: #B3B3B3;
     transition: all 0.18s;
     font-family: inherit;
   }
   .type-btn.active {
-    background: white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
+    background: #404040;
+    color: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
     font-weight: 600;
   }
 
@@ -390,7 +391,7 @@
     display: flex;
     align-items: center;
     padding: 13px 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     gap: 12px;
   }
   .rating-stars-edit { display: flex; gap: 4px; margin-left: auto; }
@@ -398,14 +399,14 @@
 
   /* ===== DETAIL ===== */
   .detail-header {
-    background: white;
+    background: #1E1E1E;
     margin: 16px;
     border-radius: 20px;
     padding: 22px 18px;
     display: flex;
     gap: 16px;
     align-items: flex-start;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   }
   .detail-icon {
     width: 72px;
@@ -421,41 +422,41 @@
   .detail-icon.book    { background: linear-gradient(135deg, rgba(255,149,0,0.2) 0%, rgba(255,149,0,0.08) 100%); }
   .detail-icon.movie   { background: linear-gradient(135deg, rgba(0,102,204,0.2) 0%, rgba(0,102,204,0.08) 100%); }
   .detail-icon.podcast { background: linear-gradient(135deg, rgba(52,199,89,0.2) 0%, rgba(52,199,89,0.08) 100%); }
-  .detail-type { font-size: 12px; color: #6e6e73; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-  .detail-title { font-size: 21px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; line-height: 1.2; }
+  .detail-type { font-size: 12px; color: #B3B3B3; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .detail-title { font-size: 21px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; line-height: 1.2; color: #FFFFFF; }
   .detail-stars { display: flex; gap: 2px; }
   .detail-stars span { font-size: 16px; }
   .info-row {
     display: flex;
     justify-content: space-between;
     padding: 13px 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     font-size: 16px;
   }
   .info-row:last-child { border-bottom: none; }
-  .info-key { color: #1d1d1f; font-weight: 400; }
-  .info-val { color: #6e6e73; text-align: right; flex: 1; margin-left: 12px; }
-  .memo-text { padding: 14px 16px; font-size: 16px; line-height: 1.6; color: #1d1d1f; }
+  .info-key { color: #FFFFFF; font-weight: 400; }
+  .info-val { color: #B3B3B3; text-align: right; flex: 1; margin-left: 12px; }
+  .memo-text { padding: 14px 16px; font-size: 16px; line-height: 1.6; color: #FFFFFF; }
   .btn-delete {
     width: calc(100% - 32px);
     margin: 0 16px 16px;
     padding: 15px;
-    background: white;
+    background: #1E1E1E;
     border: none;
     border-radius: 16px;
-    color: #ff3b30;
+    color: #ff4444;
     font-size: 16px;
     font-weight: 400;
     cursor: pointer;
     font-family: inherit;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.3);
     transition: opacity 0.15s;
   }
   .btn-delete:active { opacity: 0.7; }
   .btn-back {
     background: none;
     border: none;
-    color: #0066cc;
+    color: #1db954;
     font-size: 17px;
     cursor: pointer;
     display: flex;
@@ -468,30 +469,30 @@
 
   /* ===== STATS ===== */
   .stats-header { padding: 20px 20px 0; }
-  .stats-header h2 { font-size: 34px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .stats-header h2 { font-size: 34px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; color: #FFFFFF; }
   .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .stat-card {
-    background: white;
+    background: #1E1E1E;
     border-radius: 16px;
     padding: 14px 4px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   .stat-num { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-  .stat-lbl { font-size: 11px; color: #6e6e73; margin-top: 3px; font-weight: 500; }
-  .stat-num.all   { color: #0066cc; }
-  .stat-num.music { color: #af52de; }
+  .stat-lbl { font-size: 11px; color: #B3B3B3; margin-top: 3px; font-weight: 500; }
+  .stat-num.all   { color: #1db954; }
+  .stat-num.music { color: #c57af5; }
   .stat-num.book  { color: #ff9500; }
-  .stat-num.movie { color: #0066cc; }
+  .stat-num.movie { color: #4a9eff; }
   .year-section { margin: 16px; }
-  .year-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .year-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; color: #FFFFFF; }
   .year-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
   /* ===== SPOTIFY ===== */
   .spotify-setup-content { padding: 28px 22px; }
   .spotify-logo { font-size: 52px; text-align: center; margin-bottom: 10px; }
-  .spotify-setup-content h2 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: -0.3px; }
-  .spotify-setup-content p { font-size: 15px; color: #3a3a3c; line-height: 1.65; margin-bottom: 18px; }
+  .spotify-setup-content h2 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: -0.3px; color: #FFFFFF; }
+  .spotify-setup-content p { font-size: 15px; color: #B3B3B3; line-height: 1.65; margin-bottom: 18px; }
   .step-list { list-style: none; counter-reset: steps; }
   .step-list li {
     counter-increment: steps;
@@ -501,6 +502,7 @@
     margin-bottom: 16px;
     font-size: 15px;
     line-height: 1.55;
+    color: #FFFFFF;
   }
   .step-list li::before {
     content: counter(steps);
@@ -518,23 +520,25 @@
     margin-top: 1px;
   }
   .step-list li code {
-    background: rgba(118,118,128,0.12);
+    background: rgba(255,255,255,0.1);
     padding: 2px 7px;
     border-radius: 6px;
     font-family: 'SF Mono', Menlo, monospace;
     font-size: 13px;
+    color: #1db954;
   }
   .spotify-input {
     width: 100%;
     padding: 13px 15px;
-    border: 1.5px solid rgba(0,0,0,0.12);
+    border: 1.5px solid rgba(255,255,255,0.15);
     border-radius: 14px;
     font-size: 16px;
     outline: none;
     margin-bottom: 12px;
     font-family: 'SF Mono', Menlo, monospace;
     letter-spacing: 0.5px;
-    background: white;
+    background: #282828;
+    color: #FFFFFF;
     transition: border-color 0.15s;
   }
   .spotify-input:focus { border-color: #1db954; }
@@ -555,9 +559,9 @@
     font-family: inherit;
     transition: opacity 0.15s;
   }
-  .btn-spotify-full:disabled { background: #aeaeb2; }
+  .btn-spotify-full:disabled { background: #535353; }
   .btn-spotify-full:active { opacity: 0.8; }
-  .divider { border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 22px 0; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 22px 0; }
 
   /* Spotifyインポートリスト */
   .spotify-track-list { padding: 0 14px 14px; }
@@ -566,38 +570,38 @@
     align-items: center;
     gap: 12px;
     padding: 11px 14px;
-    background: white;
+    background: #282828;
     border-radius: 14px;
     margin-bottom: 8px;
     cursor: pointer;
     transition: opacity 0.12s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }
   .spotify-track-item:active { opacity: 0.7; }
-  .spotify-track-item.selected { background: #edfaf3; border: 1.5px solid #1db954; }
+  .spotify-track-item.selected { background: rgba(29,185,84,0.15); border: 1.5px solid #1db954; }
   .track-thumb {
     width: 50px;
     height: 50px;
     border-radius: 8px;
     object-fit: cover;
-    background: rgba(118,118,128,0.12);
+    background: rgba(255,255,255,0.1);
     flex-shrink: 0;
   }
   .track-info { flex: 1; min-width: 0; }
-  .track-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.1px; }
-  .track-artist { font-size: 13px; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .track-album { font-size: 12px; color: #aeaeb2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.1px; color: #FFFFFF; }
+  .track-artist { font-size: 13px; color: #B3B3B3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .track-album { font-size: 12px; color: #535353; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .track-check { font-size: 22px; flex-shrink: 0; }
   .spotify-import-footer {
     position: sticky;
     bottom: 0;
-    background: rgba(245,245,247,0.95);
+    background: rgba(18,18,18,0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: 14px 18px;
-    border-top: 1px solid rgba(0,0,0,0.08);
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
-  .import-count { font-size: 13px; color: #6e6e73; text-align: center; margin-bottom: 10px; font-weight: 500; }
+  .import-count { font-size: 13px; color: #B3B3B3; text-align: center; margin-bottom: 10px; font-weight: 500; }
   .btn-import {
     width: 100%;
     padding: 15px;
@@ -611,7 +615,7 @@
     font-family: inherit;
     transition: opacity 0.15s;
   }
-  .btn-import:disabled { background: #aeaeb2; }
+  .btn-import:disabled { background: #535353; }
   .btn-import:active { opacity: 0.8; }
   .loading-spinner {
     display: flex;
@@ -620,11 +624,11 @@
     justify-content: center;
     padding: 60px 20px;
     gap: 18px;
-    color: #6e6e73;
+    color: #B3B3B3;
   }
   .spinner {
     width: 36px; height: 36px;
-    border: 3px solid rgba(118,118,128,0.2);
+    border: 3px solid rgba(255,255,255,0.1);
     border-top-color: #1db954;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -632,8 +636,8 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .already-badge {
     font-size: 11px;
-    background: rgba(118,118,128,0.12);
-    color: #6e6e73;
+    background: rgba(255,255,255,0.1);
+    color: #B3B3B3;
     padding: 3px 8px;
     border-radius: 10px;
     white-space: nowrap;
@@ -665,75 +669,75 @@
   }
   /* ===== QUICK SCAN ===== */
   .btn-quickscan {
-    background: rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.1);
     border: none; border-radius: 50%;
     width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-size: 17px;
     transition: background 0.15s;
   }
-  .btn-quickscan:active { background: rgba(0,0,0,0.14); }
+  .btn-quickscan:active { background: rgba(255,255,255,0.2); }
   .qs-status-btn {
-    flex: 1; padding: 8px 4px; border: 1.5px solid rgba(0,0,0,0.1);
+    flex: 1; padding: 8px 4px; border: 1.5px solid rgba(255,255,255,0.15);
     border-radius: 10px; font-size: 13px; font-weight: 500;
-    cursor: pointer; background: white; color: #1d1d1f;
+    cursor: pointer; background: #282828; color: #FFFFFF;
     font-family: inherit; transition: all 0.15s;
   }
   .qs-status-btn.active {
-    background: #0066cc; color: white; border-color: #0066cc;
+    background: #1db954; color: white; border-color: #1db954;
   }
 
   /* ===== PODCAST SEARCH ===== */
   .podcast-show-card {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; background: white; border-radius: 14px;
-    margin: 0 0 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    padding: 12px 16px; background: #282828; border-radius: 14px;
+    margin: 0 0 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     cursor: pointer; transition: opacity 0.15s;
   }
   .podcast-show-card:active { opacity: 0.6; }
   .podcast-episode-card {
     display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; background: white; border-radius: 12px;
-    margin: 0 0 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 12px 14px; background: #282828; border-radius: 12px;
+    margin: 0 0 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     cursor: pointer; transition: opacity 0.15s;
   }
   .podcast-episode-card:active { opacity: 0.6; }
   .podcast-success-banner {
-    background: rgba(52,199,89,0.1); border-radius: 12px;
+    background: rgba(29,185,84,0.15); border-radius: 12px;
     padding: 12px 14px; display: flex; align-items: center; gap: 10px;
     margin-bottom: 8px;
   }
 
   /* ===== BACKUP BUTTON ===== */
   .btn-backup {
-    background: rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.1);
     border: none;
     border-radius: 50%;
     width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
-    color: #1d1d1f;
+    color: #FFFFFF;
     transition: background 0.15s;
   }
-  .btn-backup:active { background: rgba(0,0,0,0.12); }
+  .btn-backup:active { background: rgba(255,255,255,0.2); }
 
   /* ===== BACKUP MODAL ===== */
   .backup-card {
     display: flex;
     align-items: center;
     gap: 14px;
-    background: white;
+    background: #282828;
     border-radius: 14px;
     padding: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .backup-card-icon { font-size: 28px; flex-shrink: 0; }
   .backup-card-body { flex: 1; min-width: 0; }
-  .backup-card-title { font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px; }
-  .backup-card-desc  { font-size: 12px; color: #6e6e73; line-height: 1.5; }
+  .backup-card-title { font-size: 15px; font-weight: 600; color: #FFFFFF; margin-bottom: 4px; }
+  .backup-card-desc  { font-size: 12px; color: #B3B3B3; line-height: 1.5; }
   .btn-secondary {
-    background: rgba(0,102,204,0.1);
-    color: #0066cc;
+    background: rgba(29,185,84,0.15);
+    color: #1db954;
     border: none;
     border-radius: 10px;
     padding: 8px 14px;
@@ -742,7 +746,7 @@
     cursor: pointer;
     font-family: inherit;
   }
-  .btn-secondary:active { background: rgba(0,102,204,0.2); }
+  .btn-secondary:active { background: rgba(29,185,84,0.25); }
 
   /* ===== GROUP BAR ===== */
   .group-bar {
@@ -752,7 +756,7 @@
   .group-bar.visible { display: block; }
   .group-selector {
     display: flex;
-    background: rgba(118,118,128,0.12);
+    background: rgba(255,255,255,0.1);
     border-radius: 10px;
     padding: 2px;
   }
@@ -765,20 +769,21 @@
     font-weight: 500;
     cursor: pointer;
     background: transparent;
-    color: #1d1d1f;
+    color: #B3B3B3;
     transition: all 0.15s;
     font-family: inherit;
   }
   .group-btn.active {
-    background: white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
+    background: #404040;
+    color: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
     font-weight: 600;
   }
   .list-group-header {
     padding: 18px 20px 6px;
     font-size: 15px;
     font-weight: 700;
-    color: #1d1d1f;
+    color: #FFFFFF;
     letter-spacing: -0.2px;
     display: flex;
     align-items: baseline;
@@ -787,11 +792,11 @@
   .list-group-count {
     font-size: 12px;
     font-weight: 400;
-    color: #aeaeb2;
+    color: #B3B3B3;
   }
   .group-chevron {
     font-size: 12px;
-    color: #aeaeb2;
+    color: #B3B3B3;
     margin-right: 2px;
     transition: transform 0.15s;
   }
@@ -822,7 +827,7 @@
     position: absolute;
     left: 6px; right: 6px;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #0066cc, transparent);
+    background: linear-gradient(90deg, transparent, #1db954, transparent);
     border-radius: 2px;
     animation: scanLine 2s ease-in-out infinite;
     top: 0;
@@ -836,7 +841,7 @@
 
   .spotify-connected-badge {
     font-size: 11px;
-    background: #edfaf3;
+    background: rgba(29,185,84,0.2);
     color: #1db954;
     padding: 3px 9px;
     border-radius: 10px;
@@ -1017,7 +1022,7 @@
         Spotifyにログインして連携
       </button>
       <div style="height:8px"></div>
-      <div id="spotify-status-msg" style="font-size:13px;color:#8e8e93;text-align:center"></div>
+      <div id="spotify-status-msg" style="font-size:13px;color:#B3B3B3;text-align:center"></div>
 
       <div id="spotify-connected-section" style="display:none; margin-top:16px">
         <hr class="divider">
@@ -1034,93 +1039,6 @@
 </div>
 
 <!-- ===== クイックスキャンモーダル ===== -->
-<div class="modal-overlay" id="modal-quickscan">
-  <div class="modal" style="display:flex;flex-direction:column;max-height:88vh;overflow:hidden">
-
-    <!-- タイトルバー（ボタンなし） -->
-    <div style="flex-shrink:0;padding:16px 18px 14px;text-align:center;
-                border-bottom:1px solid rgba(0,0,0,0.08);border-radius:24px 24px 0 0;
-                background:#f5f5f7">
-      <span style="font-size:17px;font-weight:700">📚 本を追加</span>
-    </div>
-
-    <!-- スクロールコンテンツ -->
-    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-                padding:16px 20px 8px;display:flex;flex-direction:column;gap:12px">
-
-      <!-- スキャン / ISBN入力 -->
-      <div id="qs-scan-area">
-        <div style="display:flex;gap:8px;align-items:center;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-          <button onclick="openQSScanner()"
-            style="background:#f5f5f7;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:7px 10px;font-size:18px;cursor:pointer;flex-shrink:0">📷</button>
-          <span style="font-size:16px;color:#6e6e73;font-weight:500;flex-shrink:0">9784</span>
-          <input type="text" id="qs-isbn" placeholder="バーコードをスキャン or 入力" inputmode="numeric" maxlength="9"
-            style="flex:1;border:none;outline:none;font-size:15px;background:transparent"
-            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-            onkeydown="if(event.key==='Enter')lookupQS()">
-          <button onclick="lookupQS()"
-            style="background:#0066cc;color:white;border:none;border-radius:10px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0">検索</button>
-        </div>
-        <div id="qs-isbn-status" style="font-size:12px;color:#8e8e93;padding:6px 4px;display:none"></div>
-      </div>
-
-      <!-- 取得結果プレビュー -->
-      <div id="qs-preview" style="display:none;background:white;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div id="qs-cover" style="width:52px;height:70px;background:#f5f5f7;border-radius:6px;flex-shrink:0;overflow:hidden"></div>
-          <div style="flex:1;min-width:0">
-            <div id="qs-title-disp" style="font-size:16px;font-weight:700;color:#1d1d1f;line-height:1.3;margin-bottom:4px"></div>
-            <div id="qs-author-disp" style="font-size:13px;color:#6e6e73"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- タイトル（手動フォールバック） -->
-      <div id="qs-title-area" style="display:none;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-        <div style="font-size:12px;color:#6e6e73;margin-bottom:6px;font-weight:600">タイトル</div>
-        <input type="text" id="qs-title-input" placeholder="タイトルを入力"
-          style="width:100%;border:none;outline:none;font-size:16px;background:transparent;box-sizing:border-box"
-          oninput="checkQSSave()">
-      </div>
-
-      <!-- 読書状態 -->
-      <div id="qs-status-area" style="display:none;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-        <div style="font-size:12px;color:#6e6e73;margin-bottom:8px;font-weight:600">読書状態</div>
-        <div style="display:flex;gap:6px">
-          <button class="qs-status-btn active" data-status="読了" onclick="setQSStatus(this)">✅ 読了</button>
-          <button class="qs-status-btn" data-status="読書中" onclick="setQSStatus(this)">📖 読書中</button>
-          <button class="qs-status-btn" data-status="積読" onclick="setQSStatus(this)">📚 積読</button>
-        </div>
-      </div>
-
-      <!-- 評価 -->
-      <div id="qs-rating-area" style="display:none;background:white;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-        <div style="font-size:12px;color:#6e6e73;margin-bottom:8px;font-weight:600">評価</div>
-        <div id="qs-stars" style="display:flex;gap:6px"></div>
-      </div>
-
-    </div>
-
-    <!-- 下部固定ボタン（スクロールに影響されない） -->
-    <div style="flex-shrink:0;padding:12px 20px 36px;display:flex;gap:10px;
-                background:#f5f5f7;border-top:1px solid rgba(0,0,0,0.07)">
-      <button onclick="closeQuickScan()"
-        style="flex:1;padding:15px;border-radius:14px;border:none;
-               background:rgba(0,0,0,0.08);font-size:16px;font-weight:600;
-               cursor:pointer;font-family:inherit">
-        キャンセル
-      </button>
-      <button id="qs-save-btn" onclick="saveQuickScan()" disabled
-        style="flex:2;padding:15px;border-radius:14px;border:none;
-               background:#0066cc;color:white;font-size:16px;font-weight:700;
-               cursor:pointer;font-family:inherit;opacity:0.35;transition:opacity 0.2s">
-        保存する
-      </button>
-    </div>
-
-  </div>
-</div>
-
 <!-- ===== バックアップモーダル ===== -->
 <div class="modal-overlay" id="modal-backup">
   <div class="modal">
@@ -1149,9 +1067,9 @@
         <button class="btn-secondary" onclick="importData()" style="flex-shrink:0">読み込み</button>
       </div>
 
-      <div style="background:#f5f5f7;border-radius:12px;padding:14px 16px">
-        <p style="font-size:12px;color:#6e6e73;line-height:1.6;margin:0">
-          <strong style="color:#1d1d1f">GitHubでの使い方</strong><br>
+      <div style="background:#282828;border-radius:12px;padding:14px 16px">
+        <p style="font-size:12px;color:#B3B3B3;line-height:1.6;margin:0">
+          <strong style="color:#FFFFFF">GitHubでの使い方</strong><br>
           ① 書き出し → JSONファイルをGitHubリポジトリにアップ<br>
           ② 機種変更・復元時は GitHubからJSONをダウンロード → 読み込み
         </p>
@@ -1325,7 +1243,7 @@ function renderListItem(item, groupBy) {
         ${sub ? `<div class="item-sub">${escHtml(sub)}</div>` : ''}
         <div class="item-meta">
           <div class="stars">${starsHtml(item.rating)}</div>
-          <span style="color:#c7c7cc;font-size:10px">·</span>
+          <span style="color:#535353;font-size:10px">·</span>
           <span class="item-date">${formatDate(item.date)}</span>
         </div>
       </div>
@@ -1509,21 +1427,21 @@ function renderTypeFields(prefix, type) {
       <div class="form-card">
         <div class="form-row" style="gap:6px">
           <button onclick="openBarcodeScanner('${prefix}')"
-            style="background:#f5f5f7;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:6px 10px;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1">
+            style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:6px 10px;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1">
             📷
           </button>
-          <span style="font-size:16px;color:#6e6e73;flex-shrink:0;letter-spacing:0.5px;font-weight:500">9784</span>
+          <span style="font-size:16px;color:#B3B3B3;flex-shrink:0;letter-spacing:0.5px;font-weight:500">9784</span>
           <input type="text" id="${prefix}-isbn" placeholder="続きを入力（9桁）" inputmode="numeric"
             maxlength="9"
-            style="flex:1;border:none;outline:none;font-size:16px;background:transparent"
+            style="flex:1;border:none;outline:none;font-size:16px;background:transparent;color:#FFFFFF"
             oninput="this.value=this.value.replace(/[^0-9X]/g,'')"
             onkeydown="if(event.key==='Enter')lookupISBN('${prefix}')">
           <button onclick="lookupISBN('${prefix}')"
-            style="background:#0066cc;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            style="background:#1db954;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">
             検索
           </button>
         </div>
-        <div id="${prefix}-isbn-status" style="font-size:12px;color:#8e8e93;padding:0 16px 10px;display:none"></div>
+        <div id="${prefix}-isbn-status" style="font-size:12px;color:#B3B3B3;padding:0 16px 10px;display:none"></div>
       </div>
       <div class="section-label" style="margin-top:12px">本の情報</div>
       <div class="form-card">
@@ -1543,7 +1461,7 @@ function renderTypeFields(prefix, type) {
             style="flex:1;border:none;outline:none;font-size:16px;background:transparent"
             onkeydown="if(event.key==='Enter')lookupTitle('${prefix}')">
           <button onclick="lookupTitle('${prefix}')"
-            style="background:#007aff;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">
+            style="background:#1db954;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">
             検索
           </button>
         </div>
@@ -1577,7 +1495,7 @@ function renderTypeFields(prefix, type) {
             style="flex:1;border:none;outline:none;font-size:16px;background:transparent"
             onkeydown="if(event.key==='Enter')searchPodcast('${prefix}')">
           <button onclick="searchPodcast('${prefix}')"
-            style="background:#0066cc;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0">
+            style="background:#1db954;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0">
             検索
           </button>
         </div>
@@ -2041,7 +1959,7 @@ async function lookupTitle(prefix) {
 
   const status = document.getElementById(`${prefix}-search-status`);
   status.style.display = 'block';
-  status.innerHTML = '<span style="color:#8e8e93;font-size:13px">🔍 検索中...</span>';
+  status.innerHTML = '<span style="color:#B3B3B3;font-size:13px">🔍 検索中...</span>';
 
   try {
     const res = await fetch(
@@ -2068,12 +1986,12 @@ async function lookupTitle(prefix) {
       const title = escHtml(r.title || r.name || '');
       const year  = (r.release_date || r.first_air_date || '').slice(0, 4);
       const label = r.media_type === 'tv' ? 'TVドラマ' : '映画';
-      const color = r.media_type === 'tv' ? '#1db954' : '#007aff';
+      const color = r.media_type === 'tv' ? '#1db954' : '#4a9eff';
       return `<div onclick="selectTitle('${prefix}','${r.id}','${r.media_type}')"
-        style="padding:9px 0;border-bottom:1px solid #f2f2f7;cursor:pointer;display:flex;align-items:center;gap:8px">
-        <span style="font-size:14px;font-weight:500;flex:1">${title}</span>
+        style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);cursor:pointer;display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px;font-weight:500;flex:1;color:#FFFFFF">${title}</span>
         <span style="font-size:11px;color:white;background:${color};padding:2px 7px;border-radius:10px;white-space:nowrap">${label}</span>
-        <span style="font-size:12px;color:#8e8e93;white-space:nowrap">${year}</span>
+        <span style="font-size:12px;color:#B3B3B3;white-space:nowrap">${year}</span>
       </div>`;
     }).join('');
 
@@ -2085,7 +2003,7 @@ async function lookupTitle(prefix) {
 async function selectTitle(prefix, id, mediaType) {
   const apiKey = localStorage.getItem(TMDB_KEY_STORAGE);
   const status = document.getElementById(`${prefix}-search-status`);
-  status.innerHTML = '<span style="color:#8e8e93;font-size:13px">📡 詳細を取得中...</span>';
+  status.innerHTML = '<span style="color:#B3B3B3;font-size:13px">📡 詳細を取得中...</span>';
 
   try {
     const append = mediaType === 'movie' ? '&append_to_response=credits' : '';
@@ -2202,144 +2120,14 @@ async function lookupISBN(prefix) {
   }
 }
 
-// ===== クイックスキャン =====
-let qsBook = {}; // { title, author, publisher, publishedDate }
-let qsRating = 0;
-let qsStatus = '読了';
-
+// ===== クイックスキャン（既存フォームを流用） =====
 function openQuickScan() {
-  qsBook = {}; qsRating = 0; qsStatus = '読了';
-  document.getElementById('qs-isbn').value = '';
-  document.getElementById('qs-isbn-status').style.display = 'none';
-  document.getElementById('qs-preview').style.display = 'none';
-  document.getElementById('qs-title-area').style.display = 'none';
-  document.getElementById('qs-status-area').style.display = 'none';
-  document.getElementById('qs-rating-area').style.display = 'none';
-  document.getElementById('qs-title-input').value = '';
-  document.getElementById('qs-save-btn').disabled = true;
-  document.querySelectorAll('.qs-status-btn').forEach(b => b.classList.toggle('active', b.dataset.status === '読了'));
-  renderQSStars();
-  document.getElementById('modal-quickscan').classList.add('open');
-}
-function closeQuickScan() {
-  closeQSScanner();
-  document.getElementById('modal-quickscan').classList.remove('open');
-}
-
-function openQSScanner() { openBarcodeScanner('qs'); }
-
-// バーコードスキャナーからqs用にISBNを受け取る
-function onQSScanResult(isbn) {
-  document.getElementById('qs-isbn').value = isbn.startsWith('9784') ? isbn.slice(4) : isbn;
-  lookupQS();
-}
-
-async function lookupQS() {
-  const suffix = document.getElementById('qs-isbn').value.trim();
-  if (!suffix) return;
-  const isbn = '9784' + suffix;
-  const statusEl = document.getElementById('qs-isbn-status');
-  statusEl.textContent = '検索中...'; statusEl.style.display = 'block';
-  try {
-    let found = false;
-    const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${isbn}`);
-    const json = await res.json();
-    if (json[0]) {
-      const s = json[0].summary;
-      qsBook = { title: s.title || '', author: s.author || '', publisher: s.publisher || '', publishedDate: s.pubdate || '' };
-      found = true;
-    }
-    if (!found) {
-      const r2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-      const j2 = await r2.json();
-      if (j2.totalItems > 0) {
-        const v = j2.items[0].volumeInfo;
-        qsBook = { title: v.title || '', author: (v.authors||[]).join(', '), publisher: v.publisher || '', publishedDate: v.publishedDate || '' };
-        found = true;
-      }
-    }
-    if (found) {
-      statusEl.style.display = 'none';
-      showQSPreview();
-    } else {
-      statusEl.textContent = '見つかりませんでした。タイトルを手動で入力してください。';
-      qsBook = {};
-      showQSManual();
-    }
-  } catch(e) {
-    statusEl.textContent = '通信エラー。手動で入力してください。';
-    showQSManual();
-  }
-}
-
-function showQSPreview() {
-  const preview = document.getElementById('qs-preview');
-  document.getElementById('qs-title-disp').textContent = qsBook.title;
-  document.getElementById('qs-author-disp').textContent = [qsBook.author, qsBook.publisher].filter(Boolean).join(' / ');
-  preview.style.display = 'block';
-  document.getElementById('qs-title-area').style.display = 'none';
-  document.getElementById('qs-status-area').style.display = 'block';
-  document.getElementById('qs-rating-area').style.display = 'block';
-  const saveBtn = document.getElementById('qs-save-btn');
-  saveBtn.disabled = !qsBook.title;
-  saveBtn.style.opacity = qsBook.title ? '1' : '0.35';
-}
-
-function showQSManual() {
-  document.getElementById('qs-preview').style.display = 'none';
-  document.getElementById('qs-title-area').style.display = 'block';
-  document.getElementById('qs-status-area').style.display = 'block';
-  document.getElementById('qs-rating-area').style.display = 'block';
-}
-
-function checkQSSave() {
-  const manual = document.getElementById('qs-title-input').value.trim();
-  const ok = !!(manual || qsBook.title);
-  const btn = document.getElementById('qs-save-btn');
-  btn.disabled = !ok;
-  btn.style.opacity = ok ? '1' : '0.35';
-}
-
-function setQSStatus(btn) {
-  qsStatus = btn.dataset.status;
-  document.querySelectorAll('.qs-status-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function setQSRating(n) {
-  qsRating = n;
-  renderQSStars();
-}
-
-function renderQSStars() {
-  const el = document.getElementById('qs-stars');
-  if (!el) return;
-  el.innerHTML = [1,2,3,4,5].map(n =>
-    `<span onclick="setQSRating(${n})" style="font-size:28px;cursor:pointer">${n <= qsRating ? '⭐' : '☆'}</span>`
-  ).join('');
-}
-
-function saveQuickScan() {
-  const titleOverride = document.getElementById('qs-title-input').value.trim();
-  const title = titleOverride || qsBook.title;
-  if (!title) return;
-  const today = new Date().toISOString().slice(0,10);
-  const item = {
-    id: uid(), type: 'book',
-    title, date: today, rating: qsRating, memo: '',
-    artist:'', album:'',
-    author: qsBook.author || '', status: qsStatus,
-    publisher: qsBook.publisher || '', publishedDate: qsBook.publishedDate || '',
-    director:'', releaseYear:'', watchMethod:'配信'
-  };
-  data.push(item); save(); renderList();
-  closeQuickScan();
-  // 保存完了トースト
-  const toast = document.createElement('div');
-  toast.textContent = `📚「${title}」を追加しました`;
-  toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:white;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2500);
+  openAdd();
+  setTimeout(() => {
+    selectType('book');
+    document.querySelectorAll('.type-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.type === 'book'));
+  }, 60);
 }
 
 // ===== ポッドキャスト検索（iTunes Search API） =====
@@ -2351,7 +2139,7 @@ async function searchPodcast(prefix) {
   const showsEl = document.getElementById(`${prefix}-podcast-shows`);
   const epsEl   = document.getElementById(`${prefix}-podcast-episodes`);
   epsEl.innerHTML = '';
-  showsEl.innerHTML = `<div style="padding:14px 0;text-align:center;color:#6e6e73;font-size:14px">検索中...</div>`;
+  showsEl.innerHTML = `<div style="padding:14px 0;text-align:center;color:#B3B3B3;font-size:14px">検索中...</div>`;
   try {
     const res  = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=podcast&entity=podcast&limit=6&country=JP`);
     const json = await res.json();
@@ -2366,10 +2154,10 @@ async function searchPodcast(prefix) {
           <img src="${s.artworkUrl100||''}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0"
                onerror="this.style.display='none'">
           <div style="flex:1;min-width:0">
-            <div style="font-size:15px;font-weight:600;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.collectionName)}</div>
-            <div style="font-size:12px;color:#6e6e73;margin-top:2px">${escHtml(s.artistName||'')}</div>
+            <div style="font-size:15px;font-weight:600;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.collectionName)}</div>
+            <div style="font-size:12px;color:#B3B3B3;margin-top:2px">${escHtml(s.artistName||'')}</div>
           </div>
-          <span style="color:#c7c7cc;font-size:18px">›</span>
+          <span style="color:#B3B3B3;font-size:18px">›</span>
         </div>`).join('');
   } catch(e) {
     showsEl.innerHTML = `<div style="padding:12px 0;color:#ff3b30;font-size:13px;text-align:center">検索に失敗しました</div>`;
@@ -2383,18 +2171,18 @@ async function selectPodcastShow(prefix, index) {
   document.getElementById(`${prefix}-podcast-shows`).innerHTML = `
     <div class="podcast-success-banner">
       <img src="${show.artworkUrl100||''}" style="width:36px;height:36px;border-radius:6px;object-fit:cover" onerror="this.style.display='none'">
-      <div style="flex:1;font-size:14px;font-weight:600;color:#1d1d1f">${escHtml(show.collectionName)}</div>
+      <div style="flex:1;font-size:14px;font-weight:600;color:#FFFFFF">${escHtml(show.collectionName)}</div>
       <button onclick="document.getElementById('${prefix}-podcast-shows').innerHTML='';document.getElementById('${prefix}-podcast-episodes').innerHTML=''"
-        style="background:none;border:none;color:#6e6e73;font-size:13px;cursor:pointer">変更</button>
+        style="background:none;border:none;color:#B3B3B3;font-size:13px;cursor:pointer">変更</button>
     </div>`;
   const epsEl = document.getElementById(`${prefix}-podcast-episodes`);
-  epsEl.innerHTML = `<div style="padding:14px 0;text-align:center;color:#6e6e73;font-size:14px">エピソードを読み込み中...</div>`;
+  epsEl.innerHTML = `<div style="padding:14px 0;text-align:center;color:#B3B3B3;font-size:14px">エピソードを読み込み中...</div>`;
   try {
     const res  = await fetch(`https://itunes.apple.com/lookup?id=${show.collectionId}&media=podcast&entity=podcastEpisode&limit=20`);
     const json = await res.json();
     const eps  = (json.results||[]).filter(r => r.wrapperType === 'podcastEpisode');
     podcastSearchData[prefix].episodes = eps;
-    if (!eps.length) { epsEl.innerHTML = `<div style="padding:12px 0;color:#6e6e73;font-size:13px;text-align:center">エピソードが見つかりませんでした</div>`; return; }
+    if (!eps.length) { epsEl.innerHTML = `<div style="padding:12px 0;color:#B3B3B3;font-size:13px;text-align:center">エピソードが見つかりませんでした</div>`; return; }
     epsEl.innerHTML = `<div class="section-label">エピソードを選択</div>` +
       eps.map((ep, i) => {
         const d    = new Date(ep.releaseDate);
@@ -2402,10 +2190,10 @@ async function selectPodcastShow(prefix, index) {
         const mins = ep.trackTimeMillis ? Math.round(ep.trackTimeMillis/60000) + '分' : '';
         return `<div class="podcast-episode-card" onclick="selectPodcastEpisode('${prefix}',${i})">
           <div style="flex:1;min-width:0">
-            <div style="font-size:14px;font-weight:500;color:#1d1d1f;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(ep.trackName)}</div>
-            <div style="font-size:12px;color:#6e6e73;margin-top:3px">${ds}${mins?' · '+mins:''}</div>
+            <div style="font-size:14px;font-weight:500;color:#FFFFFF;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(ep.trackName)}</div>
+            <div style="font-size:12px;color:#B3B3B3;margin-top:3px">${ds}${mins?' · '+mins:''}</div>
           </div>
-          <span style="color:#c7c7cc;font-size:18px;flex-shrink:0">›</span>
+          <span style="color:#B3B3B3;font-size:18px;flex-shrink:0">›</span>
         </div>`;
       }).join('');
   } catch(e) {
