@@ -496,23 +496,19 @@
   .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 12px; }
   .cal-nav-btn { background: #282828; border: none; color: #FFFFFF; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .cal-nav-title { font-size: 18px; font-weight: 700; color: #FFFFFF; }
-  .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; margin-bottom: 2px; }
+  .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 8px; margin-bottom: 2px; }
   .cal-dow span { text-align: center; font-size: 11px; font-weight: 600; color: #B3B3B3; padding: 4px 0; }
   .cal-dow .dow-sun { color: #ff453a; }
   .cal-dow .dow-sat { color: #4a9eff; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; gap: 2px; }
-  .cal-cell { min-height: 50px; border-radius: 8px; padding: 5px 2px 3px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: background 0.1s; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 8px; gap: 2px; }
+  .cal-cell { height: 54px; border-radius: 8px; padding: 5px 1px 3px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; cursor: pointer; transition: background 0.1s; box-sizing: border-box; }
   .cal-cell:active, .cal-cell.selected { background: #282828; }
-  .cal-cell.today .cal-day-num { background: #1db954; color: #000 !important; width: 22px; height: 22px; border-radius: 50%; font-weight: 700; }
-  .cal-day-num { font-size: 13px; color: #FFFFFF; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+  .cal-cell.today .cal-day-num { background: #1db954; color: #000 !important; border-radius: 50%; font-weight: 700; }
+  .cal-day-num { font-size: 13px; color: #FFFFFF; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .cal-cell.day-sun .cal-day-num { color: #ff453a; }
   .cal-cell.day-sat .cal-day-num { color: #4a9eff; }
-  .cal-dots { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; min-height: 8px; }
-  .cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .cal-dot.music   { background: #c57af5; }
-  .cal-dot.book    { background: #ff9500; }
-  .cal-dot.movie   { background: #4a9eff; }
-  .cal-dot.podcast { background: #34c759; }
+  .cal-icons { display: flex; gap: 1px; margin-top: 2px; flex-wrap: wrap; justify-content: center; }
+  .cal-icon { font-size: 11px; line-height: 1.1; }
   .cal-detail-panel { border-top: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
   .cal-detail-header { font-size: 15px; font-weight: 700; color: #FFFFFF; padding: 14px 16px 6px; }
 
@@ -1721,12 +1717,13 @@ function renderCalendar() {
     const isToday = dateStr === todayStr;
     const isSel   = dateStr === calSelectedDate;
 
+    const CAL_ICON = { music:'🎵', book:'📚', movie:'🎬', podcast:'🎙️' };
     const types = [...new Set(items.map(i => i.type))];
-    const dots  = types.map(t => `<span class="cal-dot ${t}"></span>`).join('');
+    const icons = types.map(t => `<span class="cal-icon">${CAL_ICON[t]}</span>`).join('');
 
     html += `<div class="cal-cell${isToday?' today':''}${isSel?' selected':''}${dow===0?' day-sun':dow===6?' day-sat':''}" onclick="showDayDetail('${dateStr}')">
       <span class="cal-day-num">${d}</span>
-      <div class="cal-dots">${dots}</div>
+      <div class="cal-icons">${icons}</div>
     </div>`;
   }
   document.getElementById('cal-grid').innerHTML = html;
