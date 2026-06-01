@@ -471,6 +471,7 @@
   .stats-header { padding: 20px 20px 0; }
   .stats-header h2 { font-size: 34px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; color: #FFFFFF; }
   .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat-cards-top { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
   .stat-card {
     background: #1E1E1E;
     border-radius: 16px;
@@ -480,13 +481,65 @@
   }
   .stat-num { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
   .stat-lbl { font-size: 11px; color: #B3B3B3; margin-top: 3px; font-weight: 500; }
-  .stat-num.all   { color: #1db954; }
-  .stat-num.music { color: #c57af5; }
-  .stat-num.book  { color: #ff9500; }
-  .stat-num.movie { color: #4a9eff; }
+  .stat-num.all     { color: #1db954; }
+  .stat-num.music   { color: #c57af5; }
+  .stat-num.book    { color: #ff9500; }
+  .stat-num.movie   { color: #4a9eff; }
+  .stat-num.podcast { color: #34c759; }
   .year-section { margin: 16px; }
   .year-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; color: #FFFFFF; }
-  .year-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .year-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+  /* ===== カレンダー ===== */
+  .cal-header { padding: 20px 16px 8px; }
+  .cal-header h2 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; color: #FFFFFF; }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 12px; }
+  .cal-nav-btn { background: #282828; border: none; color: #FFFFFF; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cal-nav-title { font-size: 18px; font-weight: 700; color: #FFFFFF; }
+  .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; margin-bottom: 2px; }
+  .cal-dow span { text-align: center; font-size: 11px; font-weight: 600; color: #B3B3B3; padding: 4px 0; }
+  .cal-dow .dow-sun { color: #ff453a; }
+  .cal-dow .dow-sat { color: #4a9eff; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; gap: 2px; }
+  .cal-cell { min-height: 50px; border-radius: 8px; padding: 5px 2px 3px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: background 0.1s; }
+  .cal-cell:active, .cal-cell.selected { background: #282828; }
+  .cal-cell.today .cal-day-num { background: #1db954; color: #000 !important; width: 22px; height: 22px; border-radius: 50%; font-weight: 700; }
+  .cal-day-num { font-size: 13px; color: #FFFFFF; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+  .cal-cell.day-sun .cal-day-num { color: #ff453a; }
+  .cal-cell.day-sat .cal-day-num { color: #4a9eff; }
+  .cal-dots { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; min-height: 8px; }
+  .cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .cal-dot.music   { background: #c57af5; }
+  .cal-dot.book    { background: #ff9500; }
+  .cal-dot.movie   { background: #4a9eff; }
+  .cal-dot.podcast { background: #34c759; }
+  .cal-detail-panel { border-top: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
+  .cal-detail-header { font-size: 15px; font-weight: 700; color: #FFFFFF; padding: 14px 16px 6px; }
+
+  /* ===== 年間まとめ ===== */
+  .wrapped-year-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 12px 10px; scrollbar-width: none; }
+  .wrapped-year-tabs::-webkit-scrollbar { display: none; }
+  .wrapped-year-btn { background: #282828; color: #B3B3B3; border: none; border-radius: 20px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .wrapped-year-btn.active { background: #1db954; color: #000; }
+  .wrapped-card { background: #1E1E1E; border-radius: 16px; padding: 20px 16px 16px; margin: 0 12px; }
+  .wrapped-total { font-size: 52px; font-weight: 800; color: #FFFFFF; letter-spacing: -2px; text-align: center; line-height: 1; }
+  .wrapped-total-sub { text-align: center; font-size: 14px; color: #B3B3B3; margin-top: 4px; margin-bottom: 16px; }
+  .wrapped-type-row { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .wrapped-type { text-align: center; font-size: 11px; font-weight: 700; line-height: 1.8; }
+  .wrapped-type.music   { color: #c57af5; }
+  .wrapped-type.book    { color: #ff9500; }
+  .wrapped-type.movie   { color: #4a9eff; }
+  .wrapped-type.podcast { color: #34c759; }
+  .wrapped-type .wt-num { font-size: 22px; font-weight: 800; display: block; }
+  .wrapped-section-title { font-size: 11px; font-weight: 600; color: #B3B3B3; text-transform: uppercase; letter-spacing: 0.6px; margin: 14px 0 8px; }
+  .wrapped-best-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 10px; background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .wrapped-highlight { font-size: 15px; font-weight: 700; color: #1db954; }
+  .wrapped-bars { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .wrapped-month-row { display: flex; align-items: center; gap: 8px; }
+  .wrapped-month-label { font-size: 11px; color: #B3B3B3; width: 22px; text-align: right; flex-shrink: 0; }
+  .wrapped-bar-track { flex: 1; height: 7px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+  .wrapped-bar-fill { height: 100%; background: linear-gradient(90deg, #1db954, #1ed760); border-radius: 4px; }
+  .wrapped-month-count { font-size: 11px; color: #B3B3B3; width: 18px; text-align: right; flex-shrink: 0; }
 
   /* ===== SPOTIFY ===== */
   .spotify-setup-content { padding: 28px 22px; }
@@ -892,6 +945,24 @@
   <div id="list-container"></div>
 </div>
 
+<!-- ===== カレンダー画面 ===== -->
+<div id="screen-calendar" class="screen">
+  <div class="cal-header"><h2>カレンダー</h2></div>
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="prevMonth()">‹</button>
+    <span class="cal-nav-title" id="cal-title"></span>
+    <button class="cal-nav-btn" onclick="nextMonth()">›</button>
+  </div>
+  <div class="cal-dow">
+    <span class="dow-sun">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="dow-sat">土</span>
+  </div>
+  <div id="cal-grid"></div>
+  <div class="cal-detail-panel" id="cal-detail-panel" style="display:none">
+    <div class="cal-detail-header" id="cal-detail-header"></div>
+    <div id="cal-detail-list"></div>
+  </div>
+</div>
+
 <!-- ===== 統計画面 ===== -->
 <div id="screen-stats" class="screen">
   <div class="stats-header">
@@ -909,6 +980,9 @@
 <div class="tab-bar">
   <button class="tab-item active" id="tab-log" onclick="switchTab('log')">
     <span class="tab-icon">📋</span>ログ
+  </button>
+  <button class="tab-item" id="tab-calendar" onclick="switchTab('calendar')">
+    <span class="tab-icon">📅</span>カレンダー
   </button>
   <button class="tab-item" id="tab-stats" onclick="switchTab('stats')">
     <span class="tab-icon">📊</span>統計
@@ -1137,7 +1211,8 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
   document.getElementById('screen-' + tab).classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'stats') renderStats();
+  if (tab === 'stats')     renderStats();
+  if (tab === 'calendar')  renderCalendar();
 }
 
 // ===== フィルタ =====
@@ -1573,33 +1648,215 @@ function renderStats() {
     if (!byYear[y]) byYear[y] = [];
     byYear[y].push(item);
   });
-  function cards(items, cols = 4) {
-    const music = items.filter(i=>i.type==='music').length;
-    const book  = items.filter(i=>i.type==='book').length;
-    const movie = items.filter(i=>i.type==='movie').length;
-    if (cols === 4) return `<div class="stat-cards">
-      <div class="stat-card"><div class="stat-num all">${items.length}</div><div class="stat-lbl">合計</div></div>
+  function cards(items, isTotal = false) {
+    const music    = items.filter(i=>i.type==='music').length;
+    const book     = items.filter(i=>i.type==='book').length;
+    const movie    = items.filter(i=>i.type==='movie').length;
+    const podcast  = items.filter(i=>i.type==='podcast').length;
+    const typeCards = `
       <div class="stat-card"><div class="stat-num music">${music}</div><div class="stat-lbl">音楽</div></div>
       <div class="stat-card"><div class="stat-num book">${book}</div><div class="stat-lbl">本</div></div>
       <div class="stat-card"><div class="stat-num movie">${movie}</div><div class="stat-lbl">映画</div></div>
-    </div>`;
-    return `<div class="year-cards">
-      <div class="stat-card"><div class="stat-num music">${music}</div><div class="stat-lbl">音楽</div></div>
-      <div class="stat-card"><div class="stat-num book">${book}</div><div class="stat-lbl">本</div></div>
-      <div class="stat-card"><div class="stat-num movie">${movie}</div><div class="stat-lbl">映画</div></div>
-    </div>`;
+      <div class="stat-card"><div class="stat-num podcast">${podcast}</div><div class="stat-lbl">ポッドキャスト</div></div>`;
+    if (isTotal) return `
+      <div class="stat-cards-top">
+        <div class="stat-card"><div class="stat-num all">${items.length}</div><div class="stat-lbl">合計</div></div>
+      </div>
+      <div class="stat-cards">${typeCards}</div>`;
+    return `<div class="year-cards">${typeCards}</div>`;
   }
+  const years = [...new Set(data.map(i => i.date?.slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+  if (!wrappedYear || !years.includes(wrappedYear)) wrappedYear = years[0] || String(new Date().getFullYear());
+
   let html = '';
   if (data.length === 0) {
     html = `<div class="empty"><div class="empty-icon">📊</div><h3>まだ記録がありません</h3></div>`;
   } else {
-    html += `<div style="margin:0 12px 16px">
-      <div class="section-label" style="margin-bottom:8px">全期間（${data.length}件）</div>${cards(data,4)}</div>`;
+    // 年間まとめ
+    html += `<div style="padding-top:16px">
+      <div class="wrapped-year-tabs">${years.map(y =>
+        `<button class="wrapped-year-btn${y===wrappedYear?' active':''}" onclick="setWrappedYear('${y}')">${y}年</button>`
+      ).join('')}</div>
+      ${renderYearSummary(wrappedYear)}
+    </div>`;
+    // 全期間
+    html += `<div style="margin:20px 12px 12px">
+      <div class="section-label" style="margin-bottom:8px">全期間（${data.length}件）</div>${cards(data, true)}</div>`;
     Object.keys(byYear).sort((a,b)=>b-a).forEach(year => {
-      html += `<div class="year-section"><div class="year-title">${year}年（${byYear[year].length}件）</div>${cards(byYear[year],3)}</div>`;
+      html += `<div class="year-section"><div class="year-title">${year}年（${byYear[year].length}件）</div>${cards(byYear[year])}</div>`;
     });
   }
   document.getElementById('stats-container').innerHTML = html;
+}
+
+// ===== カレンダー =====
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calSelectedDate = null;
+
+function renderCalendar() {
+  document.getElementById('cal-title').textContent = `${calYear}年 ${calMonth + 1}月`;
+
+  // 日付→記録 マップを作成
+  const dayMap = {};
+  data.forEach(item => {
+    if (!item.date) return;
+    const d = item.date.slice(0, 10);
+    if (!dayMap[d]) dayMap[d] = [];
+    dayMap[d].push(item);
+  });
+
+  const firstDow   = new Date(calYear, calMonth, 1).getDay();  // 0=日
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  let html = '';
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-cell cal-empty"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const items   = dayMap[dateStr] || [];
+    const dow     = new Date(calYear, calMonth, d).getDay();
+    const isToday = dateStr === todayStr;
+    const isSel   = dateStr === calSelectedDate;
+
+    const types = [...new Set(items.map(i => i.type))];
+    const dots  = types.map(t => `<span class="cal-dot ${t}"></span>`).join('');
+
+    html += `<div class="cal-cell${isToday?' today':''}${isSel?' selected':''}${dow===0?' day-sun':dow===6?' day-sat':''}" onclick="showDayDetail('${dateStr}')">
+      <span class="cal-day-num">${d}</span>
+      <div class="cal-dots">${dots}</div>
+    </div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+
+  // 選択日の詳細を再描画
+  if (calSelectedDate) showDayDetail(calSelectedDate, false);
+}
+
+function prevMonth() {
+  if (calMonth === 0) { calYear--; calMonth = 11; } else calMonth--;
+  calSelectedDate = null;
+  document.getElementById('cal-detail-panel').style.display = 'none';
+  renderCalendar();
+}
+function nextMonth() {
+  if (calMonth === 11) { calYear++; calMonth = 0; } else calMonth++;
+  calSelectedDate = null;
+  document.getElementById('cal-detail-panel').style.display = 'none';
+  renderCalendar();
+}
+
+function showDayDetail(dateStr, toggle = true) {
+  const items = data.filter(i => i.date && i.date.slice(0,10) === dateStr);
+  const panel  = document.getElementById('cal-detail-panel');
+
+  // 同じ日を再タップで閉じる
+  if (toggle && calSelectedDate === dateStr) {
+    calSelectedDate = null;
+    panel.style.display = 'none';
+    document.querySelectorAll('.cal-cell.selected').forEach(c => c.classList.remove('selected'));
+    return;
+  }
+  calSelectedDate = dateStr;
+
+  // 選択ハイライト更新
+  document.querySelectorAll('.cal-cell.selected').forEach(c => c.classList.remove('selected'));
+  const cells = document.querySelectorAll('#cal-grid .cal-cell:not(.cal-empty)');
+  const day   = parseInt(dateStr.slice(8));
+  if (cells[day - 1]) cells[day - 1].classList.add('selected');
+
+  if (!items.length) { panel.style.display = 'none'; return; }
+
+  const [, m, d] = dateStr.split('-');
+  const dow = ['日','月','火','水','木','金','土'][new Date(dateStr).getDay()];
+  document.getElementById('cal-detail-header').textContent = `${parseInt(m)}月${parseInt(d)}日（${dow}）`;
+  document.getElementById('cal-detail-list').innerHTML =
+    `<div class="list">${items.map(item => renderListItem(item, 'date')).join('')}</div>`;
+  panel.style.display = 'block';
+
+  // スクロールしてパネルを表示
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+// ===== 年間まとめ =====
+let wrappedYear = null;
+
+function setWrappedYear(y) {
+  wrappedYear = y;
+  renderStats();
+}
+
+function renderYearSummary(year) {
+  const items = data.filter(i => i.date && i.date.startsWith(year));
+  if (!items.length) return `<div style="color:#B3B3B3;text-align:center;padding:24px;font-size:14px">この年の記録はありません</div>`;
+
+  const music   = items.filter(i => i.type === 'music');
+  const book    = items.filter(i => i.type === 'book');
+  const movie   = items.filter(i => i.type === 'movie');
+  const podcast = items.filter(i => i.type === 'podcast');
+
+  // お気に入り（★5 → なければ最高評価上位2）
+  const sorted = [...items].sort((a,b) => b.rating - a.rating);
+  const best   = sorted.filter(i => i.rating === sorted[0].rating).slice(0, 3);
+
+  // 最多月
+  const byMonth = {};
+  items.forEach(i => { const m = i.date.slice(5,7); byMonth[m] = (byMonth[m]||0) + 1; });
+  const topMonth = Object.entries(byMonth).sort((a,b)=>b[1]-a[1])[0];
+
+  // よく聴いたアーティスト
+  const artistCnt = {};
+  music.forEach(i => { if (i.artist) artistCnt[i.artist] = (artistCnt[i.artist]||0) + 1; });
+  const topArtist = Object.entries(artistCnt).sort((a,b)=>b[1]-a[1])[0];
+
+  // よく読んだ著者
+  const authorCnt = {};
+  book.forEach(i => { if (i.author) authorCnt[i.author] = (authorCnt[i.author]||0) + 1; });
+  const topAuthor = Object.entries(authorCnt).sort((a,b)=>b[1]-a[1])[0];
+
+  // 月別バー（1〜12月）
+  const monthlyCounts = Array.from({length:12}, (_, i) => byMonth[String(i+1).padStart(2,'0')] || 0);
+  const maxCnt = Math.max(...monthlyCounts, 1);
+  const barsHtml = monthlyCounts.map((cnt, i) =>
+    `<div class="wrapped-month-row">
+      <span class="wrapped-month-label">${i+1}月</span>
+      <div class="wrapped-bar-track"><div class="wrapped-bar-fill" style="width:${Math.round(cnt/maxCnt*100)}%"></div></div>
+      <span class="wrapped-month-count">${cnt||''}</span>
+    </div>`
+  ).join('');
+
+  const typeRow = [
+    music.length   ? `<div class="wrapped-type music"><span class="wt-num">${music.length}</span>🎵<br>音楽</div>` : '',
+    book.length    ? `<div class="wrapped-type book"><span class="wt-num">${book.length}</span>📚<br>本</div>` : '',
+    movie.length   ? `<div class="wrapped-type movie"><span class="wt-num">${movie.length}</span>🎬<br>映画</div>` : '',
+    podcast.length ? `<div class="wrapped-type podcast"><span class="wt-num">${podcast.length}</span>🎙️<br>Pod</div>` : '',
+  ].filter(Boolean).join('');
+
+  const bestHtml = best.map(i =>
+    `<div class="wrapped-best-item">
+      ${i.type==='book'&&i.coverUrl
+        ? `<img src="${escHtml(i.coverUrl)}" style="width:28px;height:40px;border-radius:3px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`
+        : `<span style="font-size:18px;flex-shrink:0">${TYPE_ICON[i.type]}</span>`}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:#FFFFFF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(i.title)}</div>
+        <div style="margin-top:2px">${starsHtml(i.rating, 11)}</div>
+      </div>
+    </div>`
+  ).join('');
+
+  return `<div class="wrapped-card">
+    <div class="wrapped-total">${items.length}</div>
+    <div class="wrapped-total-sub">件の記録</div>
+    <div class="wrapped-type-row">${typeRow}</div>
+    ${best.length ? `<div class="wrapped-section-title">🏆 今年のお気に入り</div>${bestHtml}` : ''}
+    ${topMonth  ? `<div class="wrapped-section-title">📅 一番多かった月</div><div class="wrapped-highlight">${parseInt(topMonth[0])}月（${topMonth[1]}件）</div>` : ''}
+    ${topArtist && topArtist[1] >= 2 ? `<div class="wrapped-section-title">🎵 よく聴いたアーティスト</div><div class="wrapped-highlight">${escHtml(topArtist[0])}（${topArtist[1]}曲）</div>` : ''}
+    ${topAuthor && topAuthor[1] >= 2 ? `<div class="wrapped-section-title">📚 よく読んだ著者</div><div class="wrapped-highlight">${escHtml(topAuthor[0])}（${topAuthor[1]}冊）</div>` : ''}
+    <div class="wrapped-section-title">📊 月別アクティビティ</div>
+    <div class="wrapped-bars">${barsHtml}</div>
+  </div>`;
 }
 
 // ===== ユーティリティ =====
