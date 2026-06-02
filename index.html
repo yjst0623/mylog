@@ -1836,6 +1836,11 @@ function renderYearSummary(year) {
   book.forEach(i => { if (i.author) authorCnt[i.author] = (authorCnt[i.author]||0) + 1; });
   const topAuthor = Object.entries(authorCnt).sort((a,b)=>b[1]-a[1])[0];
 
+  // よく聴いたポッドキャスト
+  const podcastCnt = {};
+  podcast.forEach(i => { if (i.showName) podcastCnt[i.showName] = (podcastCnt[i.showName]||0) + 1; });
+  const topPodcast = Object.entries(podcastCnt).sort((a,b)=>b[1]-a[1])[0];
+
   // 月別バー（1〜12月）
   const monthlyCounts = Array.from({length:12}, (_, i) => byMonth[String(i+1).padStart(2,'0')] || 0);
   const maxCnt = Math.max(...monthlyCounts, 1);
@@ -1874,6 +1879,7 @@ function renderYearSummary(year) {
     ${topMonth  ? `<div class="wrapped-section-title">📅 一番多かった月</div><div class="wrapped-highlight">${parseInt(topMonth[0])}月（${topMonth[1]}件）</div>` : ''}
     ${topArtist && topArtist[1] >= 2 ? `<div class="wrapped-section-title">🎵 よく聴いたアーティスト</div><div class="wrapped-highlight">${escHtml(topArtist[0])}（${topArtist[1]}曲）</div>` : ''}
     ${topAuthor && topAuthor[1] >= 2 ? `<div class="wrapped-section-title">📚 よく読んだ著者</div><div class="wrapped-highlight">${escHtml(topAuthor[0])}（${topAuthor[1]}冊）</div>` : ''}
+    ${topPodcast && topPodcast[1] >= 2 ? `<div class="wrapped-section-title">🎙️ よく聴いたポッドキャスト</div><div class="wrapped-highlight">${escHtml(topPodcast[0])}（${topPodcast[1]}件）</div>` : ''}
     <div class="wrapped-section-title">📊 月別アクティビティ</div>
     <div class="wrapped-bars">${barsHtml}</div>
   </div>`;
